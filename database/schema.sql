@@ -13,15 +13,16 @@ USE boilerplatedb;
 DROP TABLE IF EXISTS `role`;
 CREATE TABLE `role` (
     `id` binary(16) NOT NULL,
-    `name` varchar(255) NOT NULL,
     `code` varchar(255) NOT NULL,
+    `name` varchar(255) NOT NULL,
     `description` varchar(255),
 
     `deleted` tinyint(1) NOT NULL DEFAULT 0,
     `updatedAt` timestamp NOT NULL DEFAULT CURRENt_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT `role_id_pk` PRIMARY KEY (`id`)
+    CONSTRAINT `role_id_pk` PRIMARY KEY (`id`),
+    CONSTRAINT `role_code_u_key` UNIQUE (`code`)
 );
 
 --
