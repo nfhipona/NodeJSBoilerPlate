@@ -3,7 +3,7 @@
 require("dotenv").config();
 
 const helper        = require(__dirname + '/../helper/helper.js');
-const pjson         = require(__dirname + '/package.json');
+const pjson         = require(__dirname + '/../package.json');
 
 const fs            = require('fs');
 const path          = require('path');
