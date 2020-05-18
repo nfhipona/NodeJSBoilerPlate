@@ -3,6 +3,7 @@
 require("dotenv").config();
 
 const helper        = require(__dirname + '/../helper/helper.js');
+const pjson         = require(__dirname + '/package.json');
 
 const fs            = require('fs');
 const path          = require('path');
@@ -10,7 +11,7 @@ const path          = require('path');
 process.env.NODE_ENV = process.env.NODE_ENV || 'staging';
 const env = process.env;
 
-console.log(`\nNODE_ENV: ${env.NODE_ENV}`);
+console.log(`\nNODE_ENV: ${env.NODE_ENV} -- version: ${pjson.version}`);
 
 exports.isDebug = () => {
     const isDev = env.NODE_ENV.toLocaleLowerCase() === 'development' || env.NODE_ENV.toLocaleLowerCase() === 'staging';
@@ -92,43 +93,43 @@ exports.bcryptConfig = {
 };
 
 exports.mailOptionsSignUp = {
-    from: `App_Name <${this.mailAuth.user}>`,
-    subject: `App_Name - New Account`,
+    from: `${pjson.mail_name} <${this.mailAuth.user}>`,
+    subject: `${pjson.mail_name} - New Account`,
     html: (url) => {
         return `<br/>Hi, \
-        <br/><br/>You applied for a new account at App_Name. \
+        <br/><br/>You applied for a new account at ${pjson.mail_name}. \
         <br/><br/><b><a href=\"${url}\">Please click here to confirm your account.</a></b> \
         <br/><br/>This will expire after two hours. \
         <br/><br/>Kind regards, \
-        <br/>The App_Name team`;
+        <br/>The ${pjson.mail_name} team`;
     }
 }
 
 exports.mailOptionsUserInvite = {
-    from: `App_Name <${this.mailAuth.user}>`,
+    from: `${pjson.mail_name} <${this.mailAuth.user}>`,
     subject: (name) => {
         return `Invitation to ${name}`;
     },
     html: (url) => {
         return `<br/>Hi, \
-        <br/><br/>You applied for a new account at App_Name. \
+        <br/><br/>You applied for a new account at ${pjson.mail_name}. \
         <br/><br/><b><a href=\"${url}\">Please click here to confirm your account.</a></b> \
         <br/><br/>This will expire after two hours. \
         <br/><br/>Kind regards, \
-        <br/>The App_Name team`;
+        <br/>The ${pjson.mail_name} team`;
     }
 }
 
 exports.mailOptionsPWDReset = {
-    from: `App_Name <${this.mailAuth.user}>`,
-    subject: `App_Name - Reset Password`,
+    from: `${pjson.mail_name} <${this.mailAuth.user}>`,
+    subject: `${pjson.mail_name} - Reset Password`,
     html: (name, url) => {
         return `<br/>Hi ${name}, \
-        <br/><br/>Someone requested to a password reset for your account at App_Name. \
+        <br/><br/>Someone requested to a password reset for your account at ${pjson.mail_name}. \
         <br/><br/>If this was you please click the link below to reset your password.
         <br/><br/><b><a href=\"${url}\">Please click here to reset your password.</a></b> \
         <br/><br/>Kind regards, \
-        <br/>The App_Name team`;
+        <br/>The ${pjson.mail_name} team`;
     }
 }
 
