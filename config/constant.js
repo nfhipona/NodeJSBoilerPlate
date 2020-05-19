@@ -1,5 +1,8 @@
 'use strict';
 
+/** DEFAULT QUERY LIMIT */
+exports.LIMIT = 0;
+
 /** SERVER */
 exports.SERVER_MAINTENANCE = 'Maintenance: Server is undergoing service upgrade. Please return later'
 
