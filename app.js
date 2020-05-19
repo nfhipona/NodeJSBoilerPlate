@@ -49,7 +49,7 @@ function start() {
         .send({
             version: pjson.version,
             message: 'Welcome to boilerplate API',
-            // docs: 'https://documenter.getpostman.com/view/abcd/4776'
+            docs: 'https://documenter.getpostman.com/view/3554620/Szt5eVtE'
         })
         .end();
     });
