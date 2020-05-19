@@ -56,8 +56,8 @@ module.exports = (database, auth) => {
                 const fields = [
                     'u.*',
                     'u.id AS user_id',
-                    'BIN_TO_UUID(u.id, 1) AS id',
-                    'BIN_TO_UUID(r.id, 1) AS role_id',
+                    database.binToUUID('u.id', 'id'),
+                    database.binToUUID('r.id', 'role_id'),
                     'r.code AS role_code',
                     'r.name AS role_name',
                     'r.description AS role_description'
@@ -98,7 +98,7 @@ module.exports = (database, auth) => {
 
             const fields = [
                 'a.*',
-                'BIN_TO_UUID(a.user_id, 1) AS user_id'
+                database.binToUUID('a.user_id', 'user_id')
             ].join(', ');
 
             const query = `SELECT ${fields} FROM account a
