@@ -1,56 +1,67 @@
 'use strict';
 
-const helper    = require(__dirname + '/../helpers/helper.js');
-const c         = require(__dirname + '/../helpers/constants.js');
+const uuid          = require('uuid').v1;
+const helper        = require(__dirname + '/../helper/helper.js');
+const c             = require(__dirname + '/../config/constant.js');
 
 module.exports = (database) => {
 
     function create(req, res) {
 
+        const uuID = uuid();
+
         function _proceed() {
             const data = req.body;
+            data.id = uuID;
 
             const form = {
+                id: 'uuid',
                 code: '',
                 name: '',
                 _description: ''
             };
 
             helper.validateBody(form, data, res, () => {
-                _add(data);
+                _add(data, form);
             });
         }
 
-        function _add(data) {
+        function _add(data, form) {
 
             database.connection((err, conn) => {
                 if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
 
-                const query = 'INSERT INTO role SET ?';
+                const set_query = database.format(form, data);
+                const query = `INSERT INTO role SET ${set_query}`;
 
-                conn.query(query, data, (err, rows) => {
+                conn.query(query, (err, rows) => {
                     if (err) return helper.send400(conn, res, err, c.ROLE_CREATE_FAILED);
 
-                    _load_role(conn, rows.insertId);
+                    _load_role(conn);
                 });
             });
         }
 
-        function _load_role(connection, id) {
+        function _load_role(conn) {
 
-            const query = 'SELECT * FROM role \
-                WHERE id = ?';
+            const fields = [
+                'r.*',
+                database.binToUUID('r.id', 'id')
+            ].join(', ');
 
-            connection.query(query, [id], (err, rows, _) => {
-                if (err) { return helper.send400(connection, res, err, c.ROLE_CREATE_FAILED); }
+            const query = `SELECT ${fields} FROM role r
+                WHERE r.id = ${database.uuidToBIN(uuID)}`;
 
-                _success_response(connection, rows[0]);
+            conn.query(query, (err, rows) => {
+                if (err) return helper.send400(conn, res, err, c.ROLE_CREATE_FAILED);
+
+                _success_response(conn, rows[0]);
             });
         }
 
-        function _success_response(connection, data) {
+        function _success_response(conn, data) {
 
-            helper.send200(connection, res, data, c.ROLE_CREATE_SUCCESS);
+            helper.send200(conn, res, data, c.ROLE_CREATE_SUCCESS);
         }
 
         _proceed();
@@ -58,7 +69,7 @@ module.exports = (database) => {
 
     function update(req, res) {
 
-        const id = req.params.id;
+        const uuID = req.params.id;
 
         function _proceed() {
             const data = req.body;
@@ -70,40 +81,47 @@ module.exports = (database) => {
             };
 
             helper.validateBody(form, data, res, () => {
-                _update(data);
+                _update(data, form);
             });
         }
 
-        function _update(data) {
+        function _update(data, form) {
 
-            database(res, connection => {
+            database.connection((err, conn) => {
+                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
 
-                const query = 'UPDATE role SET ? \
-                    WHERE id = ?';
+                const set_query = database.format(form, data);
+                const query = `UPDATE role SET ${set_query}
+                    WHERE id = ${database.uuidToBIN(uuID)}`;
 
-                connection.query(query, [data, id], (err, rows, _) => {
-                    if (err) { return helper.send400(connection, res, err, c.ROLE_UPDATE_FAILED); }
+                conn.query(query, (err, rows) => {
+                    if (err) return helper.send400(conn, res, err, c.ROLE_UPDATE_FAILED);
 
-                    _load_role(connection, id);
+                    _load_role(conn);
                 });
             });
         }
 
-        function _load_role(connection, id) {
+        function _load_role(conn) {
 
-            const query = 'SELECT * FROM role \
-                WHERE id = ?';
+            const fields = [
+                'r.*',
+                database.binToUUID('r.id', 'id')
+            ].join(', ');
 
-            connection.query(query, [id], (err, rows, _) => {
-                if (err) { return helper.send400(connection, res, err, c.ROLE_UPDATE_FAILED); }
+            const query = `SELECT ${fields} FROM role r
+                WHERE r.id = ${database.uuidToBIN(uuID)}`;
 
-                _success_response(connection, rows[0]);
+            conn.query(query, (err, rows) => {
+                if (err) return helper.send400(conn, res, err, c.ROLE_UPDATE_FAILED);
+
+                _success_response(conn, rows[0]);
             });
         }
 
-        function _success_response(connection, data) {
+        function _success_response(conn, data) {
 
-            helper.send200(connection, res, data, c.ROLE_UPDATE_SUCCESS);
+            helper.send200(conn, res, data, c.ROLE_UPDATE_SUCCESS);
         }
 
         _proceed();
@@ -112,40 +130,48 @@ module.exports = (database) => {
     function fetch_multiple(req, res) {
 
         const q = req.query.q;
+        const deleted = req.query.deleted;
+
         const limit   = Number(req.query.limit) || c.LIMIT;
         const page    = (Number(req.query.page) || 1);
         const offset  = (page - 1) * limit;
 
         function proceed() {
 
-            database(res, connection => {
+            database.connection((err, conn) => {
+                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
 
-                if (limit > 0) {
-                    _get_item_count(connection);
-                }else{
-                    _get_all(connection);
-                }
+                _get_item_count(conn);
             });
         }
 
-        function _get_item_count(connection) {
+        function _get_item_count(conn) {
 
             let query = 'SELECT COUNT(r.id) as item_count FROM role r';
-            const values = [];
+            let where = [], values = [];
 
             if (q) {
-                query += ` WHERE LOWER(r.name) LIKE LOWER(?)`;
+                where.push(`LOWER(r.name) LIKE LOWER(?)`)
                 values.push(`%${q}%`);
             }
 
-            connection.query(query, values, (err, rows, _) => {
-                if (err) { return helper.send400(connection, res, err, c.ROLE_FETCH_FAILED); }
+            if (deleted) {
+                where.push(`r.deleted = ?`);
+                values.push(deleted);
+            }
 
-                _get_items(connection, rows.length > 0 ? rows[0].item_count : 0);
+            if (where.length > 0) {
+                query += ` WHERE ${where.join(' AND ')}`;
+            }
+
+            conn.query(query, values, (err, rows) => {
+                if (err) return helper.send400(conn, res, err, c.ROLE_FETCH_FAILED);
+
+                _get_items(conn, rows.length > 0 ? rows[0].item_count : 0);
             });
         }
 
-        function _get_items(connection, item_count) {
+        function _get_items(conn, item_count) {
 
             const data = {
                 item_count: item_count,
@@ -155,15 +181,29 @@ module.exports = (database) => {
             };
 
             if (item_count === 0) {
-                return _success_response(connection, data);
+                return _success_response(conn, data);
             }
 
-            let query = `SELECT * FROM role r`;
-            const values = [];
+            const fields = [
+                'r.*',
+                database.binToUUID('r.id', 'id')
+            ].join(', ');
+
+            let query = `SELECT ${fields} FROM role r`;
+            let where = [], values = [];
 
             if (q) {
-                query += ` WHERE LOWER(r.name) LIKE LOWER(?)`;
+                where.push(`LOWER(r.name) LIKE LOWER(?)`)
                 values.push(`%${q}%`);
+            }
+
+            if (deleted) {
+                where.push(`r.deleted = ?`);
+                values.push(deleted);
+            }
+
+            if (where.length > 0) {
+                query += ` WHERE ${where.join(' AND ')}`;
             }
 
             if (limit > 0) {
@@ -171,34 +211,17 @@ module.exports = (database) => {
                 values.push(limit, offset);
             }
 
-            connection.query(query, values, (err, rows, _) => {
-                if (err) { return helper.send400(connection, res, err, c.ROLE_FETCH_FAILED); }
+            conn.query(query, values, (err, rows) => {
+                if (err) return helper.send400(conn, res, err, c.ROLE_FETCH_FAILED);
 
                 data.items = rows;
-                _success_response(connection, data);
+                _success_response(conn, data);
             });
         }
 
-        function _get_all(connection) {
+        function _success_response(conn, data) {
 
-            let query = `SELECT * FROM role r`;
-            const values = [];
-
-            if (q) {
-                query += ` WHERE LOWER(r.name) LIKE LOWER(?)`;
-                values.push(`%${q}%`);
-            }
-
-            connection.query(query, values, (err, rows, _) => {
-                if (err) { return helper.send400(connection, res, err, c.ROLE_FETCH_FAILED); }
-
-                _success_response(connection, rows);
-            });
-        }
-
-        function _success_response(connection, data) {
-
-            helper.send200(connection, res, data, c.ROLE_FETCH_SUCCESS);
+            helper.send200(conn, res, data, c.ROLE_FETCH_SUCCESS);
         }
 
         proceed();
@@ -206,27 +229,28 @@ module.exports = (database) => {
 
     function remove(req, res) {
 
-        const roleId = req.params.id;
+        const uuID = req.params.id;
 
         function _proceed() {
 
-            database(res, connection => {
+            database.connection((err, conn) => {
+                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
 
-                const query = 'UPDATE role SET deleted = 1 \
-                    WHERE id = ?';
+                const query = `UPDATE role SET deleted = 1 \
+                    WHERE id = ${database.uuidToBIN(uuID)}`;
 
-                connection.query(query, [roleId], (err, rows, _) => {
-                    if (err || rows.changedRows === 0) { return helper.send400(connection, res, err, c.ROLE_DELETE_FAILED); }
+                conn.query(query, (err, rows) => {
+                    if (err || rows.changedRows === 0) return helper.send400(conn, res, err, c.ROLE_DELETE_FAILED);
 
-                    _success_response(connection, roleId);
+                    _success_response(conn);
                 });
             });
         }
 
-        function _success_response(connection, id) {
+        function _success_response(conn) {
 
-            const data = { id: id };
-            helper.send200(connection, res, data, c.ROLE_DELETE_SUCCESS);
+            const data = { id: uuID };
+            helper.send200(conn, res, data, c.ROLE_DELETE_SUCCESS);
         }
 
         _proceed();
