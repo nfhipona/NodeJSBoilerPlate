@@ -198,7 +198,12 @@ module.exports = (database) => {
                 return _success_response(conn, data);
             }
 
-            let query = `SELECT h.* FROM maintenance_history h`;
+            const fields = [
+                'h.*',
+                database.binToUUID('h.id', 'id')
+            ].join(', ');
+
+            let query = `SELECT ${fields} FROM maintenance_history h`;
             let where = [], values = [];
 
             if (q) {
@@ -216,8 +221,10 @@ module.exports = (database) => {
                 query += ` ORDER BY h.timestamp`;
             }
 
-            query += ' LIMIT ? OFFSET ?';
-            values.push(limit, offset);
+            if (limit > 0) {
+                query += ' LIMIT ? OFFSET ?';
+                values.push(limit, offset);
+            }
 
             conn.query(query, values, (err, rows) => {
                 if (err) return helper.send400(conn, res, err, c.MAINTENANCE_HISTORY_FETCH_FAILED);
