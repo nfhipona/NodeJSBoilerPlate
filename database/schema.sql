@@ -66,7 +66,7 @@ CREATE TABLE `permission` (
 --
 DROP TABLE IF EXISTS `maintenance`;
 CREATE TABLE `maintenance` (
-    `id` binary(16) NOT NULL,
+    `id` bigint(10) unsigned NOT NULL,
 
     `title` varchar(255) NOT NULL,
     `description` varchar(255) DEFAULT '',
@@ -76,7 +76,7 @@ CREATE TABLE `maintenance` (
     `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT `maintenance_history_id_pk` PRIMARY KEY (`id`)
+    CONSTRAINT `maintenance_id_pk` PRIMARY KEY (`id`)
 );
 
 --
