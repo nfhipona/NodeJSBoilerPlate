@@ -4,7 +4,9 @@
 exports.LIMIT = 0;
 
 /** SERVER */
-exports.SERVER_MAINTENANCE = 'Maintenance: Server is undergoing service upgrade. Please return later'
+exports.SERVER_MAINTENANCE  = 'Maintenance: Server is undergoing service upgrade. Please return later';
+exports.SERVER_UP_STATUS    = 'SERVER_UP';
+exports.SERVER_DOWN_STATUS  = 'SERVER_DOWN';
 
 /** APP RESOURCES */
 exports.RESOURCE_CREATE_FAILED = 'Could not create resource';
