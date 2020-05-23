@@ -147,7 +147,7 @@ module.exports = (database) => {
             });
         }
 
-        function _get_item_count(connection) {
+        function _get_item_count(conn) {
 
             let query = `SELECT COUNT(h.id) AS item_count FROM maintenance_history h`;
             let where = [], values = [];
@@ -161,14 +161,14 @@ module.exports = (database) => {
                 query += ` WHERE ${where.join(' AND ')}`;
             }
 
-            connection.query(query, values, (err, rows) => {
-                if (err) return helper.send400(connection, res, err, c.MAINTENANCE_HISTORY_FETCH_FAILED);
+            conn.query(query, values, (err, rows) => {
+                if (err) return helper.send400(conn, res, err, c.MAINTENANCE_HISTORY_FETCH_FAILED);
 
-                _get_items(connection, rows.length > 0 ? rows[0].item_count : 0);
+                _get_items(conn, rows.length > 0 ? rows[0].item_count : 0);
             });
         }
 
-        function _get_items(connection, item_count) {
+        function _get_items(conn, item_count) {
 
             const data = {
                 item_count: item_count,
@@ -178,7 +178,7 @@ module.exports = (database) => {
             };
 
             if (item_count === 0) {
-                return _success_response(connection, data);
+                return _success_response(conn, data);
             }
 
             let query = `SELECT h.* FROM maintenance_history h`;
@@ -202,17 +202,17 @@ module.exports = (database) => {
             query += ' LIMIT ? OFFSET ?';
             values.push(limit, offset);
 
-            connection.query(query, values, (err, rows) => {
-                if (err) return helper.send400(connection, res, err, c.MAINTENANCE_HISTORY_FETCH_FAILED);
+            conn.query(query, values, (err, rows) => {
+                if (err) return helper.send400(conn, res, err, c.MAINTENANCE_HISTORY_FETCH_FAILED);
 
                 data.items = rows;
-                _success_response(connection, data);
+                _success_response(conn, data);
             });
         }
 
-        function _success_response(connection, data) {
+        function _success_response(conn, data) {
 
-            helper.send200(connection, res, data, c.MAINTENANCE_HISTORY_FETCH_SUCCESS);
+            helper.send200(conn, res, data, c.MAINTENANCE_HISTORY_FETCH_SUCCESS);
         }
 
         _proceed();
