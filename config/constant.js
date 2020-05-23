@@ -2,6 +2,7 @@
 
 /** DEFAULT QUERY LIMIT */
 exports.LIMIT = 0;
+exports.ORDER = 'DESC';
 
 /** SERVER */
 exports.SERVER_MAINTENANCE  = 'Maintenance: Server is undergoing service upgrade. Please return later';
