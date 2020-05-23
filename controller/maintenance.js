@@ -30,15 +30,32 @@ module.exports = (database) => {
             database.transaction((err, conn) => {
                 if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
 
-                _set_maintenance(conn, data);
+                _check_if_down(conn, data);
             });
         }
+
+        function _check_if_down(conn, data) {
+
+            // check if the current status is same as previous
+            // prevent duplicate entry in maintenance history
+            const query = `SELECT * FROM maintenance
+                WHERE id = ? AND is_down = ?`;
+
+            conn.query(query, [1, data.is_down], (err, rows) => {
+                if (err || rows.length > 0) return database.rollback(conn, err => {
+                    helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED);
+                });
+
+                _set_maintenance(conn, data); // proceed normally
+            });
+        }
+
 
         function _set_maintenance(conn, data) {
 
             const data_cp = { ...data, id: 1 }; // set id:1 - to make sure only 1 entry is created
 
-            const query = `INSERT INTO maintenance SET ? \
+            const query = `INSERT INTO maintenance SET ?
                 ON DUPLICATE KEY UPDATE ?`;
 
             conn.query(query, [data_cp, data_cp], (err, rows) => {
@@ -62,9 +79,9 @@ module.exports = (database) => {
 
             const { is_down, ...d } = data;
             const status = is_down ? c.SERVER_DOWN_STATUS : c.SERVER_UP_STATUS; // '1 - SERVER_DOWN | 0 - SERVER_UP'
-            const history = { status, ...d, id: uuid };
+            const history = { status, ...d, id: uuID };
 
-            const set_query = database.format(form, data);
+            const set_query = database.format(form, history);
             const query = `INSERT INTO maintenance_history SET ${set_query}`;
 
             conn.query(query, (err, rows) => {
@@ -78,7 +95,7 @@ module.exports = (database) => {
 
         function _load_info(conn, infoId) {
 
-            const query = `SELECT * FROM maintenance \
+            const query = `SELECT * FROM maintenance
                 WHERE id = ?`;
 
             conn.query(query, [infoId], (err, rows) => {
@@ -109,7 +126,7 @@ module.exports = (database) => {
             database.connection((err, conn) => {
                 if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
 
-                const query = `SELECT * FROM maintenance \
+                const query = `SELECT * FROM maintenance
                     WHERE id = ?`;
 
                 conn.query(query, [1], (err, rows) => {
