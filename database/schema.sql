@@ -33,7 +33,7 @@ CREATE TABLE `resource` (
     `id` binary(16) NOT NULL,
     `name` varchar(150) NOT NULL COMMENT 'resource access name',
     `code` varchar(255) NOT NULL COMMENT 'resource access unique code',
-    `description` varchar(255) NOT NULL,
+    `description` varchar(255) NULL,
 
     `deleted` tinyint(1) NOT NULL DEFAULT 0,
     `updatedAt` timestamp NOT NULL DEFAULT CURRENt_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
