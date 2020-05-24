@@ -635,7 +635,7 @@ module.exports = (database) => {
                 const query = `SELECT ${fields} FROM role r
                     INNER JOIN permission p ON p.role_id = r.id
                     INNER JOIN resource s ON s.id = p.resource_id
-                    WHERE s.id = ${database.uuidToBIN(resourceId)} AND p.role_id = ${database.uuidToBIN(roleId)}`;
+                    WHERE s.id = ${database.uuidToBIN(element.id)} AND p.role_id = ${database.uuidToBIN(roleId)}`;
 
                 conn.query(query, (err, rows) => {
                     if (err) return next(err);
