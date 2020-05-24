@@ -42,9 +42,7 @@ module.exports = (database) => {
                 WHERE id = ? AND is_down = ?`;
 
             conn.query(query, [1, data.is_down], (err, rows) => {
-                if (err || rows.length > 0) return database.rollback(conn, err => {
-                    helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED);
-                });
+                if (err || rows.length > 0) return database.rollback(conn, () => helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED));
 
                 _set_maintenance(conn, data); // proceed normally
             });
@@ -59,9 +57,7 @@ module.exports = (database) => {
                 ON DUPLICATE KEY UPDATE ?`;
 
             conn.query(query, [data_cp, data_cp], (err, rows) => {
-                if (err) return database.rollback(conn, err => {
-                    helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED);
-                });
+                if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED));
 
                 _create_history(conn, data);
             });
@@ -85,9 +81,7 @@ module.exports = (database) => {
             const query = `INSERT INTO maintenance_history SET ${set_query}`;
 
             conn.query(query, (err, rows) => {
-                if (err) return database.rollback(conn, err => {
-                    helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED);
-                });
+                if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED));
 
                 _load_info(conn, 1);
             });
@@ -99,9 +93,7 @@ module.exports = (database) => {
                 WHERE id = ?`;
 
             conn.query(query, [infoId], (err, rows) => {
-                if (err || rows.length === 0) return database.rollback(conn, err => {
-                    helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED);
-                });
+                if (err || rows.length === 0) return database.rollback(conn, () => helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED));
 
                 _success_response(conn, rows[0]);
             });
