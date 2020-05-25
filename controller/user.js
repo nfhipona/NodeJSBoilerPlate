@@ -154,7 +154,7 @@ module.exports = (database, auth) => {
 
             helper.validateBody(form, data, res, () => {
 
-                database.connection((err, conn) => {
+                database.transaction((err, conn) => {
                     if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
 
                     _create_user(conn, data, form);
@@ -165,14 +165,14 @@ module.exports = (database, auth) => {
         function _create_user(conn, data, form) {
 
             exports._encrypt_password(data.password, (err, hash) => {
-                if (err) return helper.send400(conn, res, err, c.USER_CREATE_FAILED);
+                if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_CREATE_FAILED));
 
                 data.password = hash;
                 const set_query = database.format(form, data);
                 const query = `INSERT INTO user SET ${set_query}`;
 
                 conn.query(query, (err, rows) => {
-                    if (err) return helper.send400(conn, res, err, c.USER_CREATE_FAILED);
+                    if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_CREATE_FAILED));
 
                     _prepare_mail(conn, data);
                 });
@@ -202,10 +202,14 @@ module.exports = (database, auth) => {
 
                 if (err) {
                     const res_data = { email, err };
-                    helper.send400(conn, res, res_data, c.USER_CREATE_FAILED);
+                    database.rollback(conn, () => helper.send400(null, res, res_data, c.USER_CREATE_FAILED));
                 } else {
                     const res_data = { email, token, info, options };
-                    helper.send200(conn, res, res_data, c.USER_CREATE_SUCCESS);
+                    database.commit(conn, err => {
+                        if (err) return helper.send400(null, res, err, c.USER_CREATE_FAILED);
+
+                        helper.send200(null, res, res_data, c.USER_CREATE_SUCCESS);
+                    });
                 }
             });
         }
