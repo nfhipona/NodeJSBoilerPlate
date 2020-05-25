@@ -29,7 +29,7 @@ Boilerplate for `NodeJS` projects for easy setup and pre-defined configurations.
 1. Clone the [project](https://github.com/nferocious76/NodeJSBoilerPlate).
 2. Create your .env file for your project's environment configurations.
 3. Open the `NOTES.md` for the `env` instructions.
-4. Do `npm install` r `yarn install` to install dependencies.
+4. Do `npm install` or `yarn install` to install dependencies.
 5. Modify and make your own configuration as you see fit.
 
 ---
