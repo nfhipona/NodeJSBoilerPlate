@@ -91,8 +91,8 @@ SET @supUID = UUID_TO_BIN(UUID(), 1);
 SET @stdUID = UUID_TO_BIN(UUID(), 1);
 
 INSERT INTO `user` (`id`, `role_id`, `email`, `password`, `activated`) VALUES
-(@supUID, @supID, 'nferocious76@gmail.com', 'replace_me_hashed', 1),
-(@stdUID, @stdID, 'stduser@gmail.com', 'replace_me_hashed', 1);
+(@supUID, @supID, 'adminuser@gmail.com', '$2b$10$g2qOdl.ldIaxRPNa0YPrpeHBmQMwT3eXL6MqnpmEN4KGZjOOLN2LO', 1),
+(@stdUID, @stdID, 'stduser@gmail.com', '$2b$10$g2qOdl.ldIaxRPNa0YPrpeHBmQMwT3eXL6MqnpmEN4KGZjOOLN2LO', 1);
 
 --
 -- Data for table `account`
