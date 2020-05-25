@@ -21,6 +21,7 @@ Boilerplate for `NodeJS` projects for easy setup and pre-defined configurations.
 - [x] Stored Procedure:
     * BIN_TO_UUID
     * UUID_TO_BIN
+- [x] Send email to user for `create` and `confirmation`
 - [x] Unit Test
     * CircleCI Test - Pre-configured
     * Local Test
