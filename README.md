@@ -6,6 +6,7 @@ Boilerplate for `NodeJS` projects for easy setup and pre-defined configurations.
 
 ## Feature
 
+- [x] `UUID` as `Primary Key`
 - [x] ACL configuration
 - [x] Pre-defined ACL schema:
     * Role
@@ -17,7 +18,6 @@ Boilerplate for `NodeJS` projects for easy setup and pre-defined configurations.
 - [x] User:
     * user
     * account
-- [x] UUID as Primary Key
 - [x] Stored Procedure:
     * BIN_TO_UUID
     * UUID_TO_BIN
