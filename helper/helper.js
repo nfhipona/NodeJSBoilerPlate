@@ -210,3 +210,41 @@ exports.combineObject = (object, toObject) => {
 
     return toObject
 }
+
+/** GENERATORS */
+
+exports.randString = (length) => {
+
+	let randString = "";
+	let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+
+	for (let i = 0; i < length; i++) {
+		randString += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+
+	return randString;
+}
+
+exports.randChar = (length) => {
+
+	let randChar = "";
+	let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+	for (let i = 0; i < length; i++) {
+		randChar += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+
+	return randChar;
+}
+
+exports.randNumber = (length) => {
+
+	let randNumber = "";
+	let possible = "0123456789";
+
+	for (let i = 0; i < length; i++) {
+		randNumber += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+
+	return randNumber;
+}
