@@ -57,7 +57,7 @@ describe('TEST: RESOURCES', () => {
             data.should.have.property('id');
             data.should.have.property('code');
 
-            expect(data.code).to.equal(resource_code);
+            expect(data.code).to.be.equal(resource_code);
             resourceId = data.id;
 
             done();
@@ -83,7 +83,7 @@ describe('TEST: RESOURCES', () => {
             data.should.have.property('id');
             data.should.have.property('code');
 
-            expect(data.id).to.equal(resourceId);
+            expect(data.id).to.be.equal(resourceId);
 
             done();
         });
@@ -104,7 +104,7 @@ describe('TEST: RESOURCES', () => {
             const data = res.body.data;
             data.should.have.property('id');
 
-            expect(data.id).to.equal(resourceId);
+            expect(data.id).to.be.equal(resourceId);
 
             done();
         });
@@ -150,8 +150,8 @@ describe('TEST: RESOURCES', () => {
             const data = res.body.data;
             data.should.have.property('id');
 
-            expect(data.id).to.equal(resourceId);
-            expect(data.deleted).to.equal(1);
+            expect(data.id).to.be.equal(resourceId);
+            expect(data.deleted).to.be.equal(1);
 
             done();
         });
@@ -172,8 +172,8 @@ describe('TEST: RESOURCES', () => {
             const data = res.body.data;
             data.should.have.property('id');
 
-            expect(data.id).to.equal(resourceId);
-            expect(data.deleted).to.equal(0);
+            expect(data.id).to.be.equal(resourceId);
+            expect(data.deleted).to.be.equal(0);
 
             done();
         });

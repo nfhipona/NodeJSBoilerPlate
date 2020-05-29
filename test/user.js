@@ -84,7 +84,7 @@ describe('TEST: USERS Endpoint', () => {
             data.should.have.property('email');
             data.should.have.property('token');
 
-            expect(data.email).to.equal(email);
+            expect(data.email).to.be.equal(email);
 
             done();
         });

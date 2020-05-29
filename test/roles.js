@@ -57,7 +57,7 @@ describe('TEST: ROLES', () => {
             data.should.have.property('id');
             data.should.have.property('code');
 
-            expect(data.code).to.equal(role_code);
+            expect(data.code).to.be.equal(role_code);
             roleId = data.id;
 
             done();
@@ -83,7 +83,7 @@ describe('TEST: ROLES', () => {
             data.should.have.property('id');
             data.should.have.property('code');
 
-            expect(data.id).to.equal(roleId);
+            expect(data.id).to.be.equal(roleId);
 
             done();
         });
@@ -104,7 +104,7 @@ describe('TEST: ROLES', () => {
             const data = res.body.data;
             data.should.have.property('id');
 
-            expect(data.id).to.equal(roleId);
+            expect(data.id).to.be.equal(roleId);
 
             done();
         });
@@ -150,7 +150,7 @@ describe('TEST: ROLES', () => {
             const data = res.body.data;
             data.should.have.property('id');
 
-            expect(data.id).to.equal(roleId);
+            expect(data.id).to.be.equal(roleId);
 
             done();
         });
