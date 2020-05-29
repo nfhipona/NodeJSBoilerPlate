@@ -1,0 +1,59 @@
+#! /bin/bash
+
+### Usage
+#
+# run script - params
+#
+# ex.
+# ./reset_database.sh myuser mypass
+#
+# ex. no password
+# ./reset_database.sh myuser ""
+#
+
+### Note:
+# use only in test environments
+
+### Script
+
+user=$1
+pword=$2
+sqls="schema procedure seed"
+
+load_sql() {
+
+    for f in ${sqls[@]}; do
+        name="database/$f.sql"
+        echo "Loading SQL file: $name"
+        mysql -u$user < $name
+    done
+}
+
+load_sql_with_pwd() {
+
+    for f in ${sqls[@]}; do
+        name="database/$f.sql"
+        echo "Loading SQL file: $name"
+        mysql -u$user -p$pword < $name
+    done
+}
+
+if [ ! -z $user ]; then
+
+    echo
+    echo "SQL user: $user & pword: $pword"
+    echo
+
+    if [ ! -z $pword ]; then
+        load_sql_with_pwd $sqls
+    else
+        load_sql $sqls
+    fi
+
+    echo
+    echo "Finished loading SQL files"
+    echo
+else
+    echo "Invalid parameters"
+    echo
+fi
