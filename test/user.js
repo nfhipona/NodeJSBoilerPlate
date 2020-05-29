@@ -64,7 +64,7 @@ describe('TEST: USERS Endpoint', () => {
 
     it('POST /users/signup -- sign-up user and email validation link', done => {
 
-        let email = h.randString(5) + `@gmail.com`;
+        let email = h.randChar(5) + `@gmail.com`;
 
         api
         .post('/users/signup')
