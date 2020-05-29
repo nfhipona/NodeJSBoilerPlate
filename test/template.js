@@ -3,14 +3,15 @@
 const h                             =   require(__dirname + '/../helper/helper.js');
 const { api, expect, headers, t }   =   require(__dirname + '/base.js');
 
+return; // prevent script from running
 describe('TEST: Template', () => {
 
     let token;
 
-    it('POST /users/sign-in -- sign-in and get user token', done => {
+    it('POST /users/signin -- sign-in and get user token', done => {
 
         api
-        .post('/users/sign-in')
+        .post('/users/signin')
         .set(headers)
         .send({
             "email": "user@domain.com",
@@ -34,15 +35,14 @@ describe('TEST: Template', () => {
         });
     });
 
-    it(`PUT /users/password -- change logged in user's password`, done => {
+    it(`PUT /endpoint/:id -- update something`, done => {
 
         api
-        .put('/users/password')
+        .put('/endpoint/:id')
         .set(t(token))
         .set(headers)
         .send({
-            'new_password': 'user@pw',
-            'current_password': 'user@pw2'
+            'key': 'new value'
         })
         .expect(200)
         .end((err, res) => {
@@ -54,11 +54,10 @@ describe('TEST: Template', () => {
         });
     });
 
-    let userId;
-    it('GET /users/lists -- get all users', done => {
+    it('GET /endpoint?limit=4 -- get data with limit', done => {
 
         api
-        .get('/users/lists')
+        .get('/endpoint?limit=4')
         .set(t(token))
         .set(headers)
         .expect(200)
@@ -70,17 +69,14 @@ describe('TEST: Template', () => {
             const data = res.body.data;
             expect(data).to.have.lengthOf.above(0);
 
-            const user = data.length > 0 ? data[0] : {};
-            userId = user.id;
-
             done();
         });
     });
 
-    it('DELETE /admin/users/:id -- delete a user account', done => {
+    it('DELETE /endpoint/:id -- remove data', done => {
 
         api
-        .delete(`/admin/users/${userId}`)
+        .delete(`/endpoint/:id`)
         .set(t(token))
         .set(headers)
         .expect(200)
@@ -92,8 +88,7 @@ describe('TEST: Template', () => {
             const data = res.body.data;
             data.should.have.property('id');
 
-            const deletedId = Number(data.id);
-            expect(deletedId).to.equal(userId);
+            expect(data.id).to.be.equal(`:id`);
 
             done();
         });
