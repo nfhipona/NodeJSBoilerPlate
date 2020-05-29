@@ -67,7 +67,13 @@ describe('TEST: Template', () => {
             expect(res.body.success).to.be.true;
 
             const data = res.body.data;
-            expect(data).to.have.lengthOf.above(0);
+            data.should.have.property('item_count');
+            data.should.have.property('limit');
+            data.should.have.property('page');
+            data.should.have.property('items');
+
+            const items = data.items;
+            expect(items).to.have.lengthOf.above(0);
 
             done();
         });
