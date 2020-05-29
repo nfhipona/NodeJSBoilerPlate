@@ -89,6 +89,27 @@ describe('TEST: ROLES', () => {
         });
     });
 
+    it('GET /roles/:id -- fetch single role with id', done => {
+
+        api
+        .get(`/roles/${roleId}`)
+        .set(headers)
+        .set(t(token))
+        .expect(200)
+        .end((err, res) => {
+            if (err) return done(err);
+
+            expect(res.body.success).to.be.true;
+
+            const data = res.body.data;
+            data.should.have.property('id');
+
+            expect(data.id).to.equal(roleId);
+
+            done();
+        });
+    });
+
     it('GET /roles?limit=5 -- fetch roles with limit', done => {
 
         api
