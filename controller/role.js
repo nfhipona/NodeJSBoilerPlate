@@ -127,6 +127,44 @@ module.exports = (database) => {
         _proceed();
     }
 
+    function fetch_one(req, res) {
+
+        const roleId = req.params.id;
+
+        function proceed() {
+
+            database.connection((err, conn) => {
+                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+
+                _get_item(conn);
+            });
+        }
+
+        function _get_item(conn) {
+
+            const fields = [
+                'r.*',
+                database.binToUUID('r.id', 'id')
+            ].join(', ');
+
+            const query = `SELECT ${fields} FROM role r
+                WHERE r.deleted <> 1 AND r.id = ${database.uuidToBIN(roleId)}`;
+
+            conn.query(query, (err, rows) => {
+                if (err || rows.length == 0) return helper.send400(conn, res, err, c.ROLE_FETCH_FAILED);
+
+                _success_response(conn, rows[0]);
+            });
+        }
+
+        function _success_response(conn, data) {
+
+            helper.send200(conn, res, data, c.ROLE_FETCH_SUCCESS);
+        }
+
+        proceed();
+    }
+
     function fetch_multiple(req, res) {
 
         const q = req.query.q;
@@ -259,6 +297,7 @@ module.exports = (database) => {
     return {
         create,
         update,
+        fetch_one,
         fetch_multiple,
         remove
     }
