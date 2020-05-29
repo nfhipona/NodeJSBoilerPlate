@@ -84,7 +84,6 @@ describe('TEST: ROLES', () => {
             data.should.have.property('code');
 
             expect(data.id).to.equal(roleId);
-            roleId = data.id;
 
             done();
         });
@@ -130,8 +129,7 @@ describe('TEST: ROLES', () => {
             const data = res.body.data;
             data.should.have.property('id');
 
-            const deletedId = Number(data.id);
-            expect(deletedId).to.equal(roleId);
+            expect(data.id).to.equal(roleId);
 
             done();
         });
