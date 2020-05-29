@@ -9,7 +9,7 @@
   "license": "MIT",
   "license-url": "https://github.com/nferocious76/NodeJSBoilerPlate/blob/master/LICENSE",
   "scripts": {
-    "test": "mocha --timeout 15000 --reporter mochawesome",
+    "test": "mocha --timeout 150000 --reporter mochawesome",
     "start": "node app.js"
   },
   "dependencies": {
