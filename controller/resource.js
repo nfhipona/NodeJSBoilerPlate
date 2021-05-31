@@ -10,7 +10,6 @@ module.exports = (database) => {
     /** APP RESOURCES */
 
     function add_resource(req, res) {
-
         const uuID = uuid();
 
         function _proceed() {
@@ -30,7 +29,6 @@ module.exports = (database) => {
         }
 
         function _begin(data, form) {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
 
@@ -46,7 +44,6 @@ module.exports = (database) => {
         }
 
         function _load_resource(conn) {
-
             const fields = [
                 'r.*',
                 database.binToUUID('r.id', 'id')
@@ -63,7 +60,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.RESOURCE_CREATE_SUCCESS);
         }
 
@@ -71,7 +67,6 @@ module.exports = (database) => {
     }
 
     function update_resource(req, res) {
-
         const uuID = req.params.id;
 
         function _proceed() {
@@ -89,7 +84,6 @@ module.exports = (database) => {
         }
 
         function _begin(data, form) {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
 
@@ -106,7 +100,6 @@ module.exports = (database) => {
         }
 
         function _load_resource(conn) {
-
             const fields = [
                 'r.*',
                 database.binToUUID('r.id', 'id')
@@ -123,7 +116,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.RESOURCE_UPDATE_SUCCESS);
         }
 
@@ -131,7 +123,6 @@ module.exports = (database) => {
     }
 
     function retrieve_resource(req, res) {
-
         const uuID = req.params.id;
 
         function _proceed() {
@@ -144,7 +135,6 @@ module.exports = (database) => {
         }
 
         function _load_resource(conn) {
-
             const fields = [
                 'r.*',
                 database.binToUUID('r.id', 'id')
@@ -161,7 +151,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.RESOURCE_FETCH_SUCCESS);
         }
 
@@ -169,7 +158,6 @@ module.exports = (database) => {
     }
 
     function retrieve_resources(req, res) {
-
         const q       = req.query.q;
         const deleted = req.query.deleted;
 
@@ -188,7 +176,6 @@ module.exports = (database) => {
         }
 
         function _get_item_count(conn) {
-
             let query = `SELECT COUNT(s.id) AS item_count FROM resource s`;
             let where = [], values = [];
 
@@ -214,7 +201,6 @@ module.exports = (database) => {
         }
 
         function _get_items(conn, item_count) {
-
             const data = {
                 item_count: item_count,
                 limit: limit,
@@ -276,7 +262,6 @@ module.exports = (database) => {
     }
 
     function enable_resource(req, res) {
-
         const uuID = req.params.id;
 
         function _proceed() {
@@ -296,7 +281,6 @@ module.exports = (database) => {
         }
 
         function _load_resource(conn) {
-
             const fields = [
                 'r.*',
                 database.binToUUID('r.id', 'id')
@@ -313,7 +297,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.RESOURCE_ENABLE_SUCCESS);
         }
 
@@ -321,7 +304,6 @@ module.exports = (database) => {
     }
 
     function disable_resource(req, res) {
-
         const uuID = req.params.id;
 
         function _proceed() {
@@ -341,7 +323,6 @@ module.exports = (database) => {
         }
 
         function _load_resource(conn) {
-
             const fields = [
                 'r.*',
                 database.binToUUID('r.id', 'id')
@@ -358,7 +339,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.RESOURCE_DISABLE_SUCCESS);
         }
 
@@ -368,7 +348,6 @@ module.exports = (database) => {
     /** RESOURCE PERMISSIONS */
 
     function set_permission(req, res) {
-
         const roleId        = req.params.roleId;
         const resourceId    = req.params.id;
 

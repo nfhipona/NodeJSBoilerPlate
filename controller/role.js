@@ -7,7 +7,6 @@ const c             = require(__dirname + '/../config/constant.js');
 module.exports = (database) => {
 
     function create(req, res) {
-
         const uuID = uuid();
 
         function _proceed() {

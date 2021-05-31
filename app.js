@@ -27,6 +27,15 @@ function prepareApp() {
     app.use(express.static('.'));
     app.use(cors(config.cors));
 
+    // :-- configure api
+    
+    const v1api       = express();
+    router(v1api, database, auth);
+    resource(v1api, database, auth);
+    app.use('/api/v1/', v1api);
+
+    // :-- configure api
+
     /**
      * @api {get} / Server information
      * @apiName GetServerInfo
@@ -50,12 +59,6 @@ function prepareApp() {
         }
         next();
     });
-
-    // :-- configure api
-    const v1api       = express();
-    router(v1api, database, auth);
-    resource(v1api, database, auth);
-    app.use('/api/v1/', v1api);
 
     return app;
 }

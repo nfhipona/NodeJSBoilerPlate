@@ -10,7 +10,6 @@ exports.validateBody = (form, source, res, next) => {
 
     if (data instanceof Error) {
         let error_data = this.constructErrorData(data.message, null);
-
         return this.sendResponse(res, 400, error_data);
     }
 
