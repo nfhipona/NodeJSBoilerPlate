@@ -1,10 +1,9 @@
 'use strict';
 
-const util  = require(__dirname + '/../lib/util.js');
-const fs    = require('fs');
+const util      = require(__dirname + '/../lib/util.js');
+const cluster   = require("cluster");
 
 exports.validateBody = (form, source, res, next) => {
-
     let data = util._get
         .form_data(form)
         .from(source);
@@ -22,76 +21,59 @@ exports.validateBody = (form, source, res, next) => {
 
 exports.send200 = (conn, res, data, message) => {
     if (conn) conn.release();
-
     const responseData = this.constructSuccessData(message, data);
-
 	this.sendResponse(res, 200, responseData);
 }
 
 exports.send400 = (conn, res, err, message) => {
     if (conn) conn.release();
-
     const error_data = this.checkError(err);
     const responseData = this.constructErrorData(message, error_data);
-
 	this.sendResponse(res, 400, responseData);
 }
 
 exports.send401 = (conn, res, err, message) => {
     if (conn) conn.release();
-
     const error_data = this.checkError(err);
     const responseData = this.constructErrorData(message, error_data);
-
 	this.sendResponse(res, 401, responseData);
 }
 
 exports.send403 = (conn, res, err, message) => {
     if (conn) conn.release();
-
     const error_data = this.checkError(err);
     const responseData = this.constructErrorData(message, error_data);
-
 	this.sendResponse(res, 403, responseData);
 }
 
 exports.send404 = (conn, res, err, message) => {
     if (conn) conn.release();
-
     const error_data = this.checkError(err);
     const responseData = this.constructErrorData(message, error_data);
-
 	this.sendResponse(res, 404, responseData);
 }
 
 exports.send500 = (conn, res, err, message) => {
     if (conn) conn.release();
-
     const error_data = this.checkError(err);
     const responseData = this.constructErrorData(message, error_data);
-
 	this.sendResponse(res, 500, responseData);
 }
 
 exports.send503 = (conn, res, err, message) => {
     if (conn) conn.release();
-
     const error_data = this.checkError(err);
     const responseData = this.constructErrorData(message, error_data);
-
 	this.sendResponse(res, 503, responseData);
 }
 
 exports.sendConnError = (res, err, message) => {
-
     const error_data = this.checkError(err);
     const responseData = this.constructErrorData(message, error_data);
-
 	this.sendResponse(res, 400, responseData);
 }
 
 exports.sendResponse = (res, code, data) => {
-
     res
         .status(code)
         .send(data)
@@ -145,17 +127,14 @@ exports.logErr = (err, data) => {
 
 exports.constructErrorData = (context, data) => {
     if (!data && context) console.log(`Error message: `, context);
-
     return this.responseData(false, context, data);
 };
 
 exports.constructSuccessData = (context, data) => {
-
     return this.responseData(true, context, data);
 }
 
 exports.responseData = (success, context, data) => {
-
     const response_data = {
         success: success,
         message: context,
@@ -168,11 +147,8 @@ exports.responseData = (success, context, data) => {
 /** PARSER */
 
 exports.parseSettingsConfig = (settingsStr) => {
-
     let settings = {};
-
     if (!settingsStr) return settings;
-
     const settingsComponent = settingsStr.split('&');
     for (const component of settingsComponent) {
         const subComponents = component.split('::');
@@ -181,40 +157,32 @@ exports.parseSettingsConfig = (settingsStr) => {
 
         settings[key] = this.isBoolean(value) ? this.boolValue(value) : this.isNanConvert(value);
     }
-
     return settings;
 }
 
 exports.isBoolean = (value) => {
-
     return value === 'false' || value === 'true';
 }
 
 exports.boolValue = (value) => {
-
     return value === 'false' ? false : true;
 }
 
 exports.isNanConvert = (value) => {
-
     if (value.length === 0) return value;
-
     return isNaN(value) ? value : Number(value);
 }
 
 exports.combineObject = (object, toObject) => {
-
     for (const key in object) {
         toObject[key] = object[key]
     }
-
     return toObject
 }
 
 /** GENERATORS */
 
 exports.randString = (length) => {
-
 	let randString = "";
 	let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
 
@@ -226,7 +194,6 @@ exports.randString = (length) => {
 }
 
 exports.randChar = (length) => {
-
 	let randChar = "";
 	let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -238,7 +205,6 @@ exports.randChar = (length) => {
 }
 
 exports.randNumber = (length) => {
-
 	let randNumber = "";
 	let possible = "0123456789";
 
@@ -247,4 +213,10 @@ exports.randNumber = (length) => {
 	}
 
 	return randNumber;
+}
+
+exports.log = (n) => {
+    if (cluster.isMaster) {
+        console.log(n);
+    }
 }

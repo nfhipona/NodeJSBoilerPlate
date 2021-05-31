@@ -11,7 +11,7 @@ const path          = require('path');
 process.env.NODE_ENV = process.env.NODE_ENV || 'staging';
 const env = process.env;
 
-console.log(`\nNODE_ENV: ${env.NODE_ENV} -- version: ${pjson.version}`);
+helper.log(`\nNODE_ENV: ${env.NODE_ENV} -- version: ${pjson.version}`);
 
 exports.isDebug = () => {
     const isDev = env.NODE_ENV.toLocaleLowerCase() === 'development' || env.NODE_ENV.toLocaleLowerCase() === 'staging';
@@ -52,13 +52,13 @@ const cerFile = 'certificate.crt';
 try {
     key = fs.readFileSync(path.resolve(`../certificate-files/${keyFile}`));
 } catch (err) {
-    console.log(`Server SSL key not found: ${keyFile}`)
+    helper.log(`Server SSL key not found: ${keyFile}`);
 }
 
 try {
     cert = fs.readFileSync(path.resolve(`../certificate-files/${cerFile}`));
 } catch (err) {
-    console.log(`Server SSL cert not found: ${cerFile}`)
+    helper.log(`Server SSL cert not found: ${cerFile}`);
 }
 
 exports.certificate         = { key: key, cert: cert };
