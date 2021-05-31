@@ -25,18 +25,16 @@ const cert          = config.certificate;
 module.exports = start();
 
 function start() {
-
-    process.setMaxListeners(0);
-
     const hasSSLCert    = (cert.key && cert.file);
     const server        = hasSSLCert ? https.Server(cert, app) : http.Server(app);
     const io            = socketIO(server);
     const socket        = socketJS(io, auth);
 
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
-    app.use(express.static('.'));
+    // setup middlewares
+    app.use(express.json()) // for parsing application/json
+    app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
     app.use(morgan('dev'));
+    app.use(express.static('.'));
     app.use(cors(config.cors));
 
     /**
