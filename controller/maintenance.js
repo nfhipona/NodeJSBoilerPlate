@@ -28,7 +28,7 @@ module.exports = (database) => {
         function _begin(data) {
 
             database.transaction((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 _check_if_down(conn, data);
             });
@@ -116,7 +116,7 @@ module.exports = (database) => {
         function _proceed() {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const query = `SELECT * FROM maintenance
                     WHERE id = ?`;
@@ -150,7 +150,7 @@ module.exports = (database) => {
         function _proceed() {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 _get_item_count(conn);
             });
