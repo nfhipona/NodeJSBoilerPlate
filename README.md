@@ -7,7 +7,10 @@ Boilerplate for `NodeJS` projects for easy setup and pre-defined configurations.
 ## Feature
 
 - [x] `UUID` as `Primary Key`
-- [x] ACL configuration
+- [x] ACL MATRIX configuration
+- [x] JWT Authentication
+- [x] Cluster Mode - utilizes all available CPU Cores/Threads
+- [x] Mailer
 - [x] Pre-defined ACL schema:
     * Role
     * Resource
@@ -17,6 +20,13 @@ Boilerplate for `NodeJS` projects for easy setup and pre-defined configurations.
     * History
 - [x] User:
     * user
+        - email or username login support
+        - sign-in
+        - sign-up
+        - confirm account
+        - change password
+        - forgot password
+        - confirm reset password
     * account
 - [x] Stored Procedure:
     * BIN_TO_UUID
