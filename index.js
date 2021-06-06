@@ -40,10 +40,8 @@ if (cluster.isMaster) {
     socketJS(httpServer, redisConf);
 
     httpServer.listen(process.env.PORT || serverConf.port, () => {
-        if (cluster.isMaster) {
-            console.log(
-                `\nApp Version: ${pjson.version}\nNumber of CPU: ${numCPUs}\nRunning on ${hasSSLCert ? 'https' : 'http'} connection\nListening on port: ${serverConf.port}\n`
-            );
-        }
+        console.log(
+            `\nApp Version: ${pjson.version}\nNumber of CPU: ${numCPUs}\nRunning on ${hasSSLCert ? 'https' : 'http'} connection\nListening on port: ${serverConf.port}\nWorker ${process.pid}\n`
+        );
     });
 }
