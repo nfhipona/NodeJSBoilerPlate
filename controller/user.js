@@ -126,10 +126,97 @@ module.exports = (database, auth) => {
         _proceed();
     }
 
-    
+    function signup(req, res) {
+        function _proceed() {
+            const data = req.body;
+            data.id = uuid();
+
+            const form = {
+                id: 'uuid',
+                role_id: 'uuid',
+                email: '',
+                _username: '',
+                password: ''
+            };
+
+            helper.validateBody(form, data, res, () => {
+                database.transaction((err, conn) => {
+                    if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
+
+                    _create_user(conn, data, form);
+                });
+            });
+        }
+
+        function _create_user(conn, data, form) {
+            exports._encrypt_password(data.password, (err, hash) => {
+                if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_CREATE_FAILED));
+                data.password = hash; // set hashed password
+
+                const set_query = database.format(form, data);
+                const query = `INSERT INTO user SET ${set_query}`;
+
+                conn.query(query, (err, rows) => {
+                    if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_CREATE_FAILED));
+
+                    _prepare_mail(conn, data);
+                });
+            });
+        }
+
+        function _prepare_mail(conn, data) {
+            const email = data.email;
+            const type = c.REGISTRATION_TOKEN;
+
+            const payload = {
+                type,
+                email: email,
+                id: data.id,
+                role_id: data.role_id
+            };
+
+            const token_options = { type, expiresIn: c.TOKEN_MIN_EXPIRY };
+            const token = auth.createToken(payload, token_options).token;
+            const email_validation_link = _create_email_validation_link(data, token);
+            const from = mailOptionsSignUp.from;
+            const subject = mailOptionsSignUp.subject;
+            const html = mailOptionsSignUp.html(email_validation_link);
+            const options = exports._create_mail_options(from, email, subject, html);
+
+            if (isDev) {
+                transporter.sendMail(options, (success, res_data) => {
+                    if (success) {
+                        database.commit(conn, err => {
+                            if (err) return helper.send400(null, res, err, c.USER_CREATE_FAILED);
+                            helper.send200(null, res, options, c.USER_CREATE_SUCCESS);
+                        });                    
+                    }else{
+                        database.rollback(conn, () => helper.send400(null, res, res_data.error, c.USER_CREATE_FAILED));
+                    }
+                });
+            }else{
+                // :- Send only
+                transporter.sendOnly(options);
+                database.commit(conn, err => {
+                    if (err) return helper.send400(null, res, err, c.USER_CREATE_FAILED);
+                    helper.send200(null, res, null, c.USER_CREATE_SUCCESS);
+                });
+            }
+        }
+
+        function _create_email_validation_link(data, token) {
+            const obj = { email: data.email, role_id: data.role_id };
+            const base64encode = util.encodeObj(obj);
+            const url = `${api_host}${api_user_confirm_registration}${base64encode}?token=${token}`;
+            return url;
+        }
+
+        _proceed();
+    }
 
     return {
-        signin
+        signin,
+        signup
     }
 }
 
