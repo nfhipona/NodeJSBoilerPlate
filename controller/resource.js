@@ -30,7 +30,7 @@ module.exports = (database) => {
 
         function _begin(data, form) {
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const set_query = database.format(form, data);
                 const query = `INSERT INTO resource SET ${set_query}`;
@@ -85,7 +85,7 @@ module.exports = (database) => {
 
         function _begin(data, form) {
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const set_query = database.format(form, data);
                 const query = `UPDATE resource SET ${set_query}
@@ -128,7 +128,7 @@ module.exports = (database) => {
         function _proceed() {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 _load_resource(conn);
             });
@@ -169,7 +169,7 @@ module.exports = (database) => {
         function _proceed() {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 _get_item_count(conn);
             });
@@ -267,7 +267,7 @@ module.exports = (database) => {
         function _proceed() {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const query = `UPDATE resource SET deleted = 0
                     WHERE id = ${database.uuidToBIN(uuID)}`;
@@ -309,7 +309,7 @@ module.exports = (database) => {
         function _proceed() {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const query = `UPDATE resource SET deleted = 1
                     WHERE id = ${database.uuidToBIN(uuID)}`;
@@ -368,7 +368,7 @@ module.exports = (database) => {
         function _begin(data) {
 
             database.transaction((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 _update_permission(conn, data);
             });
@@ -494,7 +494,7 @@ module.exports = (database) => {
         function _proceed() {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 _get_item_count(conn);
             });
