@@ -1,6 +1,7 @@
 'use strict';
 
 const util      = require(__dirname + '/../lib/util.js');
+const c         = require(__dirname + '/../lib/util.js');
 const cluster   = require("cluster");
 
 exports.validateBody = (form, source, res, next) => {
@@ -9,67 +10,57 @@ exports.validateBody = (form, source, res, next) => {
         .from(source);
 
     if (data instanceof Error) {
-        let error_data = this.constructErrorData(data.message, null);
-        return this.sendResponse(res, 400, error_data);
+        const responseData = this.responseData(false, c.BAD_PARAMETERS, data.message);
+        return this.sendResponse(res, 400, responseData);
     }
 
     next(data);
 };
 
 /** RESPONSE HANDLER */
-
-exports.send200 = (conn, res, data, message) => {
+exports.send = (code) => (conn, res, data, context) => {
     if (conn) conn.release();
-    const responseData = this.constructSuccessData(message, data);
-	this.sendResponse(res, 200, responseData);
+    const responseData = this.responseData(true, context, data);
+	this.sendResponse(res, code, responseData);
 }
 
-exports.send400 = (conn, res, err, message) => {
-    if (conn) conn.release();
-    const error_data = this.checkError(err);
-    const responseData = this.constructErrorData(message, error_data);
-	this.sendResponse(res, 400, responseData);
+exports.send200 = (conn, res, data, context) => {
+    this.send(200)(conn, res, data, context);
 }
 
-exports.send401 = (conn, res, err, message) => {
-    if (conn) conn.release();
+exports.send400 = (conn, res, err, context) => {
     const error_data = this.checkError(err);
-    const responseData = this.constructErrorData(message, error_data);
-	this.sendResponse(res, 401, responseData);
+    this.send(400)(conn, res, error_data, context);
 }
 
-exports.send403 = (conn, res, err, message) => {
-    if (conn) conn.release();
-    const error_data = this.checkError(err);
-    const responseData = this.constructErrorData(message, error_data);
-	this.sendResponse(res, 403, responseData);
+exports.send401 = (conn, res, err, context) => {
+    const error_data = this.checkError(err, 401);
+    this.send(401)(conn, res, error_data, context);
 }
 
-exports.send404 = (conn, res, err, message) => {
-    if (conn) conn.release();
-    const error_data = this.checkError(err);
-    const responseData = this.constructErrorData(message, error_data);
-	this.sendResponse(res, 404, responseData);
+exports.send403 = (conn, res, err, context) => {
+    const error_data = this.checkError(err, 403);
+    this.send(403)(conn, res, error_data, context);
 }
 
-exports.send500 = (conn, res, err, message) => {
-    if (conn) conn.release();
-    const error_data = this.checkError(err);
-    const responseData = this.constructErrorData(message, error_data);
-	this.sendResponse(res, 500, responseData);
+exports.send404 = (conn, res, err, context) => {
+    const error_data = this.checkError(err, 404);
+    this.send(404)(conn, res, error_data, context);
 }
 
-exports.send503 = (conn, res, err, message) => {
-    if (conn) conn.release();
-    const error_data = this.checkError(err);
-    const responseData = this.constructErrorData(message, error_data);
-	this.sendResponse(res, 503, responseData);
+exports.send500 = (conn, res, err, context) => {
+    const error_data = this.checkError(err, 500);
+    this.send(500)(conn, res, error_data, context);
 }
 
-exports.sendConnError = (res, err, message) => {
+exports.send503 = (conn, res, err, context) => {
+    const error_data = this.checkError(err, 503);
+    this.send(503)(conn, res, error_data, context);
+}
+
+exports.sendError = (conn, res, err, context) => {
     const error_data = this.checkError(err);
-    const responseData = this.constructErrorData(message, error_data);
-	this.sendResponse(res, 400, responseData);
+    this.send(error_data.code)(conn, res, error_data, context);
 }
 
 exports.sendResponse = (res, code, data) => {
@@ -81,8 +72,8 @@ exports.sendResponse = (res, code, data) => {
 
 /** ERROR HANDLER */
 
-exports.checkError = (err) => {
-    console.log('\nError: ', err);
+exports.checkError = (err, errCode = 400) => {
+    this.log(err, 'ERROR');
 
     if (err && err.code) {
         const code = err.code.toString();
@@ -95,13 +86,17 @@ exports.checkError = (err) => {
             code === 'ER_NO_REFERENCED_ROW_2' ||
             code === 'ER_DATA_TOO_LONG') {
 
-            return this.logErr(err, { message: 'Bad parameters.' });
+            return { code: 400, error: 'Bad parameters.' };
 
         } else if (code === 'ER_DUP_ENTRY') {
-            return this.logErr(err, { message: 'Duplicate entry' }); // err.sqlMessage
+            return { code: 409, error: 'Duplicate entry' }; // err.sqlMessage
 
-        } else if (code === 'ECONNREFUSED') {
-            return this.logErr(err, { message: 'Server connection error.' });
+        } else if (code === 'ECONNREFUSED' ||
+            code === 'ER_NOT_SUPPORTED_AUTH_MODE' ||
+            code === 'ER_DBACCESS_DENIED_ERROR' ||
+            code === 'ESOCKET') {
+
+            return { code: 500, error: 'Server connection error.' };
 
         } else if (code === 'ER_PARSE_ERROR' ||
             code === 'ER_WRONG_NUMBER_OF_COLUMNS_IN_SELECT' ||
@@ -109,38 +104,38 @@ exports.checkError = (err) => {
             code === 'ER_LOCK_WAIT_TIMEOUT' ||
             code === 'PROTOCOL_SEQUENCE_TIMEOUT') {
 
-            return this.logErr(err, { message: 'Server error.' });
+            return { code: 500, error: 'Internal server error.' };
         } else if (err.sql) {
-            return this.logErr(err, { message: 'Server error.' });
+            return { code: 500, error: 'Internal server error.' };
         }
     }
-
-    return err;
+    return err || null;
 };
 
-exports.logErr = (err, data) => {
-    console.log('\nServer error log: ', err);
-
-    return data;
-}
-
-exports.constructErrorData = (context, data) => {
-    if (!data && context) console.log(`Error message: `, context);
-    return this.responseData(false, context, data);
-};
-
-exports.constructSuccessData = (context, data) => {
-    return this.responseData(true, context, data);
-}
-
+/**
+ * 
+ * @param {*} success 
+ * @param {*} context 
+ * @param {*} data 
+ * @returns 
+ * 
+ * "success": true,
+ * "message": MSG_CONTEXT,
+ * "data": { // MSG_DATA
+ *    "message": "Nothing to do here."
+ * }
+ */
 exports.responseData = (success, context, data) => {
     const response_data = {
         success: success,
         message: context,
         data: data
     };
-
     return response_data;
+}
+
+exports.errMsgData = (code, msg) => { // used for response.data.data message for uniformity
+    return { code, error: msg };
 }
 
 /** PARSER */
@@ -154,7 +149,9 @@ exports.parseSettingsConfig = (settingsStr) => {
         const key = subComponents[0];
         const value = subComponents[1];
 
-        settings[key] = this.isBoolean(value) ? this.boolValue(value) : this.isNanConvert(value);
+        if (key && value && value.length > 0) {
+            settings[key] = this.isBoolean(value) ? this.boolValue(value) : this.isNanConvert(value);
+        }
     }
     return settings;
 }
@@ -214,8 +211,6 @@ exports.randNumber = (length) => {
 	return randNumber;
 }
 
-exports.log = (n) => {
-    if (cluster.isMaster) {
-        console.log(n);
-    }
+exports.log = (n, message = "LOG") => {
+    console.log(`${cluster.isMaster ? 'Master' : 'Worker'} ${process.pid}::${message}:`, n);
 }
