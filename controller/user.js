@@ -214,9 +214,57 @@ module.exports = (database, auth) => {
         _proceed();
     }
 
+    function confirm(req, res) {
+        const decoded = req.get('decoded_token');
+
+        function _proceed() {
+            const data = req.body;
+            const form = {
+                base64: ''
+            };
+
+            helper.validateBody(form, data, res, () => {
+                database.connection((err, conn) => {
+                    if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
+                    
+                    const decodedObj = util.decodeObj(data.base64);
+                    if (decodedObj.email == decoded.email) {
+                        _activate_account(conn, decodedObj);
+                    }else{
+                        const response_message = helper.errMsgData(400, 'Mismatched user data.');
+                        helper.send400(conn, res, response_message, c.USER_ACTIVATION_FAILED);
+                    }
+                });
+            });
+        }
+
+        function _activate_account(conn, decodedObj) {
+            const where = [
+                `u.id = ${database.uuidToBIN(decoded.id)}`,
+                'u.deleted <> 1'
+            ].join(' AND ');
+
+            const query = `UPDATE user u \
+                SET u.activated = 1 \
+                WHERE ${where}`;
+
+            conn.query(query, (err, rows, _) => {
+                if (err) return helper.send400(conn, res, err, c.USER_ACTIVATION_FAILED);
+                if (rows.changedRows === 0) {
+                    const response_message = helper.errMsgData(400, 'Link has already expired or is no longer available.');
+                    return helper.send400(conn, res, response_message, c.USER_ACTIVATION_FAILED);
+                }
+                helper.send200(conn, res, decodedObj, c.USER_ACTIVATION_SUCCESS);
+            });
+        }
+
+        _proceed();
+    }
+
     return {
         signin,
-        signup
+        signup,
+        confirm
     }
 }
 
