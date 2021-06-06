@@ -322,11 +322,104 @@ module.exports = (database, auth) => {
         _proceed();
     }
 
+    function forgot_pw(req, res) {
+        function _proceed() {
+            const data = req.body;
+            const form = {
+                email: ''
+            };
+    
+            helper.validateBody(form, data, res, () => {
+                database.connection((err, conn) => {
+                    if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
+                    
+                    _get_user(conn, data); // validate if user is still active
+                });
+            });
+        }
+
+        function _get_user(conn, data) {
+            const fields = [
+                'u.*',
+                'u.id AS user_id',
+                database.binToUUID('u.id', 'id'),
+                database.binToUUID('r.id', 'role_id'),
+                'r.code AS role_code',
+                'r.name AS role_name',
+                'r.description AS role_description'
+            ].join(', ');
+
+            const where = [
+                'u.email = ?',
+                'u.activated = 1',
+                'u.deleted <> 1'
+            ].join(' AND ');
+
+            const query = `SELECT ${fields} FROM user u \
+                INNER JOIN role r ON r.id = u.role_id \
+                WHERE ${where}`;
+
+            conn.query(query, [data.email], (err, rows, _) => {
+                if (err) return helper.send400(conn, res, err, c.USER_FORGOT_PW_FAILED);
+                if (rows.length === 0) {
+                    const response_message = helper.errMsgData(400, 'User does not exist and/or is no longer active.');
+                    return helper.send400(conn, res, response_message, c.USER_FORGOT_PW_FAILED);
+                }
+
+                _prepare_mail(conn, rows[0]);
+            });
+        }
+
+        function _prepare_mail(conn, record) {
+            const email = record.email;
+            const type = c.RESET_PW_TOKEN;
+
+            const payload = {
+                type,
+                email: email,
+                id: record.id,
+                role_id: record.role_id
+            };
+
+            const token_options = { type, expiresIn: c.TOKEN_MIN_EXPIRY };
+            const token = auth.createToken(payload, token_options).token;
+            const email_validation_link = _create_email_validation_link(record, token);
+            const from = mailOptionsPWDReset.from;
+            const subject = mailOptionsPWDReset.subject;
+            const html = mailOptionsPWDReset.html(email, email_validation_link);
+            const options = exports._create_mail_options(from, email, subject, html);
+            
+            if (isDev) {
+                transporter.sendMail(options, (success, res_data) => {
+                    if (success) {
+                        helper.send200(conn, res, options, c.USER_FORGOT_PW_SUCCESS);                   
+                    }else{
+                        helper.send400(conn, res, res_data.error, c.USER_FORGOT_PW_FAILED)
+                    }
+                });
+            }else{
+                // :- Send only
+                transporter.sendOnly(options);
+                helper.send200(conn, res, null, c.USER_FORGOT_PW_SUCCESS);
+            }
+        }
+
+        function _create_email_validation_link(record, token) {
+            const obj = { email: record.email, role_id: record.role_id };
+            const base64encode = util.encodeObj(obj);
+            const url = `${api_host}${api_user_confirm_registration}${base64encode}?token=${token}`;
+            return url;
+        }
+    
+        _proceed();
+    }
+
     return {
         signin,
         signup,
         confirm,
-        change_pw
+        change_pw,
+        forgot_pw
     }
 }
 
