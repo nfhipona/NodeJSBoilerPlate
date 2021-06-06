@@ -11,23 +11,20 @@ const path          = require('path');
 process.env.NODE_ENV = process.env.NODE_ENV || 'staging';
 const env = process.env;
 
-helper.log(`\nNODE_ENV: ${env.NODE_ENV} -- version: ${pjson.version}`);
+helper.log(`NODE_ENV: ${env.NODE_ENV} -- version: ${pjson.version}`);
 
 exports.isDebug = () => {
     const isDev = env.NODE_ENV.toLocaleLowerCase() === 'development' || env.NODE_ENV.toLocaleLowerCase() === 'staging';
-
     return isDev;
 }
 
 exports.isDev = () => {
     const isDev = env.NODE_ENV.toLocaleLowerCase() === 'development';
-
     return isDev;
 }
 
 exports.isStage = () => {
     const isStage = env.NODE_ENV.toLocaleLowerCase() === 'staging';
-
     return isStage;
 }
 
@@ -93,51 +90,60 @@ exports.bcryptConfig = {
 };
 
 exports.mailOptionsSignUp = {
-    from: `${pjson.mail_name} <${this.mailAuth.user}>`,
-    subject: `${pjson.mail_name} - New Account`,
+    from: `${pjson.app_name} <${this.mailAuth.user}>`,
+    subject: `${pjson.app_name} - New Account`,
     html: (url) => {
         return `<br/>Hi, \
-        <br/><br/>You applied for a new account at ${pjson.mail_name}. \
+        <br/><br/>You applied for a new account at ${pjson.app_name}. \
         <br/><br/><b><a href=\"${url}\">Please click here to confirm your account.</a></b> \
         <br/><br/>This will expire after two hours. \
         <br/><br/>Kind regards, \
-        <br/>The ${pjson.mail_name} team`;
+        <br/>The ${pjson.app_name} team`;
     }
 }
 
 exports.mailOptionsUserInvite = {
-    from: `${pjson.mail_name} <${this.mailAuth.user}>`,
+    from: `${pjson.app_name} <${this.mailAuth.user}>`,
     subject: (name) => {
         return `Invitation to ${name}`;
     },
     html: (url) => {
         return `<br/>Hi, \
-        <br/><br/>You applied for a new account at ${pjson.mail_name}. \
+        <br/><br/>You applied for a new account at ${pjson.app_name}. \
         <br/><br/><b><a href=\"${url}\">Please click here to confirm your account.</a></b> \
         <br/><br/>This will expire after two hours. \
         <br/><br/>Kind regards, \
-        <br/>The ${pjson.mail_name} team`;
+        <br/>The ${pjson.app_name} team`;
     }
 }
 
 exports.mailOptionsPWDReset = {
-    from: `${pjson.mail_name} <${this.mailAuth.user}>`,
-    subject: `${pjson.mail_name} - Reset Password`,
-    html: (name, url) => {
-        return `<br/>Hi ${name}, \
-        <br/><br/>Someone requested to a password reset for your account at ${pjson.mail_name}. \
-        <br/><br/>If this was you please click the link below to reset your password.
-        <br/><br/><b><a href=\"${url}\">Please click here to reset your password.</a></b> \
+    from: `${pjson.app_name} <${this.mailAuth.user}>`,
+    subject: `${pjson.app_name} - Reset Password`,
+    html: (email, url) => {
+        return `<br/>Hi ${email}, \
+        <br/><br/>Someone has requested a password reset for your account at <b>${pjson.app_name}</b>. \
+        <br/><br/>If this was you please click the link below to reset your password. \
+        <br/><b><a href=\"${url}\">Please click here to reset your password.</a></b> \
         <br/><br/>Kind regards, \
-        <br/>The ${pjson.mail_name} team`;
+        <br/>The ${pjson.app_name} team`;
+    }
+}
+
+exports.mailOptionsPWDResetConfirm = {
+    from: `${pjson.app_name} <${this.mailAuth.user}>`,
+    subject: `${pjson.app_name} - Password Changed`,
+    html: (email) => {
+        return `<br/>Hi ${email}, \
+        <br/><br/>Your account password at <b>${pjson.app_name}</b> has been updated. \
+        <br/><br/>Kind regards, \
+        <br/>The ${pjson.app_name} team`;
     }
 }
 
 exports.transporterSettings = () => {
-
     let settings = helper.combineObject({}, exports.mailConfig);
     settings = helper.combineObject(settings, { auth: exports.mailAuth });
-
     return settings;
 }
 
