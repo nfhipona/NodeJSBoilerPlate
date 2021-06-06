@@ -1,6 +1,6 @@
 {
   "name": "boilerplate-nodejs",
-  "mail_name": "Boilerplate NodeJS",
+  "app_name": "Boilerplate NodeJS",
   "version": "0.0.1",
   "description": "Template for NodeJS/ExpressJs projects for backend development",
   "main": "index.js",
@@ -18,13 +18,11 @@
     "cluster": "^0.7.7",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "fs": "^0.0.1-security",
-    "https": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
-    "node-mysql": "^0.4.2",
-    "nodemailer": "^6.4.2",
+    "mysql": "^2.18.1",
+    "nodemailer": "^6.6.1",
     "redis": "^3.1.2",
     "socket.io": "^4.1.2",
     "uuid": "^8.3.2"
