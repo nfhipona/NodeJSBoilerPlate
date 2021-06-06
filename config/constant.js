@@ -1,13 +1,23 @@
 'use strict';
 
+/** AUTH TOKEN */
+exports.TOKEN_MAX_EXPIRY = 60 * 60 * 24 * 7 // 7d - user tokens
+exports.TOKEN_MIN_EXPIRY = 60 * 60 * 2 // 2h - registration token...
+
+exports.USER_TOKEN = 'user_token';
+exports.REGISTRATION_TOKEN = 'registration_token';
+exports.RESET_PW_TOKEN = 'reset_password_token';
+
 /** DEFAULT QUERY LIMIT */
 exports.LIMIT = 0;
 exports.ORDER = 'DESC';
 
 /** SERVER */
-exports.SERVER_MAINTENANCE  = 'Maintenance: Server is undergoing service upgrade. Please return later';
+exports.SERVER_WELCOME      = "Welcome, the server is up and running"
+exports.SERVER_NO_CONTENT   = "No Content"
 exports.SERVER_UP_STATUS    = 'SERVER_UP';
 exports.SERVER_DOWN_STATUS  = 'SERVER_DOWN';
+exports.SERVER_MAINTENANCE  = 'Maintenance: Server is undergoing service upgrade. Please return later';
 
 /** APP RESOURCES */
 exports.RESOURCE_CREATE_FAILED = 'Could not create resource';
@@ -56,12 +66,17 @@ exports.SERVER_ERROR                = 'Server error';
 exports.DATABASE_CONN_ERROR         = 'Connection error';
 exports.SERVICE_UNAVAILABLE         = 'Service unavailable';
 exports.FORBIDDEN_REQUEST           = 'Forbidden request';
-exports.SERVER_MAINTENANCE          = 'Maintenance: Server is undergoing service upgrade. Please return later';
+exports.BAD_PARAMETERS              = 'Bad parameters';
 
 /** USER */
-exports.USER_SIGNIN_FAILED          = 'Invalid email and/or password';
+exports.USER_SIGNIN_FAILED          = 'Invalid email/username and/or password';
 exports.USER_SIGNIN_SUCCESS         = 'Signed in success';
 exports.USER_SIGNED_OUT             = 'You have logged out';
 exports.USER_CREATE_FAILED          = 'Could not create user';
 exports.USER_CREATE_SUCCESS         = 'User created';
-
+exports.USER_ACTIVATION_SUCCESS     = 'User activated';
+exports.USER_ACTIVATION_FAILED      = 'User activation failed';
+exports.USER_CHANGE_PW_SUCCESS      = 'User password changed';
+exports.USER_CHANGE_PW_FAILED       = 'User password change failed';
+exports.USER_FORGOT_PW_SUCCESS      = 'User password reset request';
+exports.USER_FORGOT_PW_FAILED       = 'User password reset request failed';
