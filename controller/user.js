@@ -261,10 +261,72 @@ module.exports = (database, auth) => {
         _proceed();
     }
 
+    function change_pw(req, res) {
+        function _proceed() {
+            const data = req.body;
+            const form = {
+                email: '',
+                password: ''
+            };
+            
+            helper.validateBody(form, data, res, () => {
+                database.connection((err, conn) => {
+                    if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
+                    
+                    _get_user(conn, data); // validate if user is still active
+                });
+            });
+        }
+
+        function _get_user(conn, data) {
+            const fields = [
+                'u.*',
+                'u.id AS user_id',
+                database.binToUUID('u.id', 'id')
+            ].join(', ');
+
+            const where = [
+                'u.email = ?',
+                'u.activated = 1',
+                'u.deleted <> 1'
+            ].join(' AND ');
+
+            const query = `SELECT ${fields} FROM user u \
+                WHERE ${where}`;
+
+            conn.query(query, [data.email], (err, rows, _) => {
+                if (err) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
+                if (rows.length === 0) {
+                    const response_message = helper.errMsgData(400, 'User does not exist and/or is no longer active.');
+                    return helper.send400(conn, res, response_message, c.USER_CHANGE_PW_FAILED);
+                }
+
+                _change_password(conn, data, rows[0]);
+            });
+        }
+
+        function _change_password(conn, data, record) {
+            exports._encrypt_password(data.password, (err, hash) => {
+                const query = `UPDATE user u \
+                    SET u.password = ? \
+                    WHERE u.email = ?`;
+
+                conn.query(query, [hash, data.email], (err, rows) => {
+                    if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
+                    
+                    helper.send200(conn, res, null, c.USER_CHANGE_PW_SUCCESS);
+                });
+            });
+        }
+
+        _proceed();
+    }
+
     return {
         signin,
         signup,
-        confirm
+        confirm,
+        change_pw
     }
 }
 
