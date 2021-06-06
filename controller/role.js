@@ -28,7 +28,7 @@ module.exports = (database) => {
         function _add(data, form) {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const set_query = database.format(form, data);
                 const query = `INSERT INTO role SET ${set_query}`;
@@ -87,7 +87,7 @@ module.exports = (database) => {
         function _update(data, form) {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const set_query = database.format(form, data);
                 const query = `UPDATE role SET ${set_query}
@@ -133,7 +133,7 @@ module.exports = (database) => {
         function proceed() {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 _get_item(conn);
             });
@@ -176,7 +176,7 @@ module.exports = (database) => {
         function proceed() {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 _get_item_count(conn);
             });
@@ -271,7 +271,7 @@ module.exports = (database) => {
         function _proceed() {
 
             database.connection((err, conn) => {
-                if (err) return helper.sendConnError(res, err, c.DATABASE_CONN_ERROR);
+                if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const query = `UPDATE role SET deleted = 1 \
                     WHERE id = ${database.uuidToBIN(uuID)}`;
