@@ -3,12 +3,14 @@
                     require(__dirname + '/lib/prototype.js'); // load prototypes
 
 const config        = require(__dirname + '/config/config.js');
+const c             = require(__dirname + '/config/constant.js');
 const database      = require(__dirname + '/lib/database.js');
 const router        = require(__dirname + '/lib/router_main.js');
 const resource      = require(__dirname + '/lib/router_resource.js');
 const authJS        = require(__dirname + '/lib/auth.js'); // Auth - access token
 const cors          = require(__dirname + '/lib/cors.js');
 const redisClient   = require(__dirname + '/lib/redis.js');
+const helper        = require(__dirname + '/helper/helper.js');
 const pjson         = require(__dirname + '/package.json');
 
 const morgan        = require('morgan');
@@ -42,20 +44,19 @@ function prepareApp() {
      * @apiGroup Server
      */
     app.get('/', (req, res) => {
-        res.status(200)
-        .json({
+        const welcomeMsg = {
             version: pjson.version,
-            message: 'Welcome to boilerplate API',
+            message: `Welcome to ${pjson.app_name} API`,
             docs: 'https://documenter.getpostman.com/view/3554620/Szt5eVtE'
-        });
+        };
+        helper.send(200)(null, res, welcomeMsg, c.SERVER_WELCOME);
     });
     
     // handles unknown routes
     app.all('*', (req, res, next) => {
         if (req.method !== 'OPTIONS') {
-            res.status(200)
-               .json({ message: 'Nothing to do here.' });
-            return
+            // 204 No Content
+            return helper.sendResponse(res, 204, c.SERVER_NO_CONTENT);
         }
         next();
     });
