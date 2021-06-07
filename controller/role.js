@@ -26,12 +26,12 @@ module.exports = (database) => {
         }
 
         function _add(data, form) {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const set_query = database.format(form, data);
-                const query = `INSERT INTO role SET ${set_query}`;
+                const query = `INSERT INTO role \
+                    SET ${set_query}`;
 
                 conn.query(query, (err, rows) => {
                     if (err) return helper.send400(conn, res, err, c.ROLE_CREATE_FAILED);
@@ -59,7 +59,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.ROLE_CREATE_SUCCESS);
         }
 
@@ -67,7 +66,6 @@ module.exports = (database) => {
     }
 
     function update(req, res) {
-
         const uuID = req.params.id;
 
         function _proceed() {
@@ -85,7 +83,6 @@ module.exports = (database) => {
         }
 
         function _update(data, form) {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -102,7 +99,6 @@ module.exports = (database) => {
         }
 
         function _load_role(conn) {
-
             const fields = [
                 'r.*',
                 database.binToUUID('r.id', 'id')
@@ -119,7 +115,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.ROLE_UPDATE_SUCCESS);
         }
 
@@ -127,11 +122,9 @@ module.exports = (database) => {
     }
 
     function fetch_one(req, res) {
-
         const roleId = req.params.id;
 
-        function proceed() {
-
+        function _proceed() {
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -140,14 +133,18 @@ module.exports = (database) => {
         }
 
         function _get_item(conn) {
-
             const fields = [
                 'r.*',
                 database.binToUUID('r.id', 'id')
             ].join(', ');
 
+            const where = [
+                `r.deleted <> 1`,
+                `r.id = ${database.uuidToBIN}`
+            ].join(' AND ');
+
             const query = `SELECT ${fields} FROM role r
-                WHERE r.deleted <> 1 AND r.id = ${database.uuidToBIN}`;
+                WHERE ${where}`;
 
             conn.query(query, [roleId], (err, rows) => {
                 if (err || rows.length == 0) return helper.send400(conn, res, err, c.ROLE_FETCH_FAILED);
@@ -157,15 +154,13 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.ROLE_FETCH_SUCCESS);
         }
 
-        proceed();
+        _proceed();
     }
 
     function fetch_multiple(req, res) {
-
         const q = req.query.q;
         const deleted = req.query.deleted;
 
@@ -173,8 +168,7 @@ module.exports = (database) => {
         const page    = (Number(req.query.page) || 1);
         const offset  = (page - 1) * limit;
 
-        function proceed() {
-
+        function _proceed() {
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -183,7 +177,6 @@ module.exports = (database) => {
         }
 
         function _get_item_count(conn) {
-
             let query = 'SELECT COUNT(r.id) as item_count FROM role r';
             let where = [], values = [];
 
@@ -209,7 +202,6 @@ module.exports = (database) => {
         }
 
         function _get_items(conn, item_count) {
-
             const data = {
                 item_count: item_count,
                 limit: limit,
@@ -257,19 +249,16 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.ROLE_FETCH_SUCCESS);
         }
 
-        proceed();
+        _proceed();
     }
 
     function remove(req, res) {
-
         const uuID = req.params.id;
 
         function _proceed() {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -285,7 +274,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn) {
-
             const data = { id: uuID };
             helper.send200(conn, res, data, c.ROLE_DELETE_SUCCESS);
         }
