@@ -50,9 +50,9 @@ module.exports = (database) => {
             ].join(', ');
 
             const query = `SELECT ${fields} FROM resource r
-                WHERE r.id = ${database.uuidToBIN(uuID)}`;
+                WHERE r.id = ${database.uuidToBIN}`;
 
-            conn.query(query, (err, rows) => {
+            conn.query(query, [uuID], (err, rows) => {
                 if (err || rows.length === 0) return helper.send400(conn, res, err, c.RESOURCE_CREATE_FAILED);
 
                 _success_response(conn, rows[0]);
@@ -89,9 +89,9 @@ module.exports = (database) => {
 
                 const set_query = database.format(form, data);
                 const query = `UPDATE resource SET ${set_query}
-                    WHERE id = ${database.uuidToBIN(uuID)}`;
+                    WHERE id = ${database.uuidToBIN}`;
 
-                conn.query(query, (err, rows) => {
+                conn.query(query, [uuID], (err, rows) => {
                     if (err) return helper.send400(conn, res, err, c.RESOURCE_UPDATE_FAILED);
 
                     _load_resource(conn);
@@ -106,9 +106,9 @@ module.exports = (database) => {
             ].join(', ');
 
             const query = `SELECT ${fields} FROM resource r
-                WHERE r.id = ${database.uuidToBIN(uuID)}`;
+                WHERE r.id = ${database.uuidToBIN}`;
 
-            conn.query(query, (err, rows) => {
+            conn.query(query, [uuID], (err, rows) => {
                 if (err || rows.length === 0) return helper.send400(conn, res, err, c.RESOURCE_UPDATE_FAILED);
 
                 _success_response(conn, rows[0]);
@@ -126,7 +126,6 @@ module.exports = (database) => {
         const uuID = req.params.id;
 
         function _proceed() {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -141,9 +140,9 @@ module.exports = (database) => {
             ].join(', ');
 
             const query = `SELECT ${fields} FROM resource r
-                WHERE r.id = ${database.uuidToBIN(uuID)}`;
+                WHERE r.id = ${database.uuidToBIN}`;
 
-            conn.query(query, (err, rows) => {
+            conn.query(query, [uuID], (err, rows) => {
                 if (err || rows.length === 0) return helper.send400(conn, res, err, c.RESOURCE_FETCH_FAILED);
 
                 _success_response(conn, rows[0]);
@@ -167,7 +166,6 @@ module.exports = (database) => {
         const order   = req.query.order || c.ORDER;
 
         function _proceed() {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -254,7 +252,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.RESOURCE_FETCH_SUCCESS);
         }
 
@@ -265,14 +262,13 @@ module.exports = (database) => {
         const uuID = req.params.id;
 
         function _proceed() {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const query = `UPDATE resource SET deleted = 0
-                    WHERE id = ${database.uuidToBIN(uuID)}`;
+                    WHERE id = ${database.uuidToBIN}`;
 
-                conn.query(query, (err, rows) => {
+                conn.query(query, [uuID], (err, rows) => {
                     if (err || rows.changedRows === 0) return helper.send400(conn, res, err, c.RESOURCE_ENABLE_FAILED);
 
                     _load_resource(conn);
@@ -287,9 +283,9 @@ module.exports = (database) => {
             ].join(', ');
 
             const query = `SELECT ${fields} FROM resource r
-                WHERE r.id = ${database.uuidToBIN(uuID)}`;
+                WHERE r.id = ${database.uuidToBIN}`;
 
-            conn.query(query, (err, rows) => {
+            conn.query(query, [uuID], (err, rows) => {
                 if (err || rows.length === 0) return helper.send400(conn, res, err, c.RESOURCE_FETCH_FAILED);
 
                 _success_response(conn, rows[0]);
@@ -307,14 +303,13 @@ module.exports = (database) => {
         const uuID = req.params.id;
 
         function _proceed() {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const query = `UPDATE resource SET deleted = 1
-                    WHERE id = ${database.uuidToBIN(uuID)}`;
+                    WHERE id = ${database.uuidToBIN}`;
 
-                conn.query(query, (err, rows) => {
+                conn.query(query, [uuID], (err, rows) => {
                     if (err || rows.changedRows === 0) return helper.send400(conn, res, err, c.RESOURCE_DISABLE_FAILED);
 
                     _load_resource(conn);
@@ -329,9 +324,9 @@ module.exports = (database) => {
             ].join(', ');
 
             const query = `SELECT ${fields} FROM resource r
-                WHERE r.id = ${database.uuidToBIN(uuID)}`;
+                WHERE r.id = ${database.uuidToBIN}`;
 
-            conn.query(query, (err, rows) => {
+            conn.query(query, [uuID], (err, rows) => {
                 if (err || rows.length === 0) return helper.send400(conn, res, err, c.RESOURCE_FETCH_FAILED);
 
                 _success_response(conn, rows[0]);
@@ -352,7 +347,6 @@ module.exports = (database) => {
         const resourceId    = req.params.id;
 
         function _proceed() {
-
             const data = req.body;
 
             const form = {
@@ -366,7 +360,6 @@ module.exports = (database) => {
         }
 
         function _begin(data) {
-
             database.transaction((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -375,7 +368,6 @@ module.exports = (database) => {
         }
 
         function _update_permission(conn, data) {
-
             const _forAdd = data.forAdd;
             const _forRemove = data.forRemove;
 
@@ -388,7 +380,6 @@ module.exports = (database) => {
             });
 
             function __add_permission(mode, next) {
-
                 const form = {
                     role_id: 'uuid',
                     resource_id: 'uuid',
@@ -414,10 +405,17 @@ module.exports = (database) => {
         function _remove_permission(conn, modes, next) {
             if (!modes || modes.length === 0) return next(modes || []);
 
-            const query = `UPDATE permission SET is_disabled = 1
-                WHERE role_id = ${database.uuidToBIN(roleId)} AND resource_id = ${database.uuidToBIN(resourceId)} AND mode IN (?)`;
+            const where = [
+                `role_id = ${database.uuidToBIN}`,
+                `resource_id = ${database.uuidToBIN}`,
+                `mode IN (?)`
+            ].join(' AND ');
 
-            conn.query(query, [modes], (err, rows) => {
+            const query = `UPDATE permission \
+                SET is_disabled = 1
+                WHERE ${where}`;
+
+            conn.query(query, [roleId, resourceId, modes], (err, rows) => {
                 if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.PERMISSION_UPDATE_FAILED));
 
                 return next(modes || []);
@@ -425,16 +423,15 @@ module.exports = (database) => {
         }
 
         function _load_resource(conn) {
-
             const fields = [
                 'r.*',
                 database.binToUUID('r.id', 'id')
             ].join(', ');
 
             const query = `SELECT ${fields} FROM resource r
-                WHERE r.id = ${database.uuidToBIN(resourceId)}`;
+                WHERE r.id = ${database.uuidToBIN}`;
 
-            conn.query(query, (err, rows) => {
+            conn.query(query, [resourceId], (err, rows) => {
                 if (err || rows.length === 0) return database.rollback(conn, () => helper.send400(null, res, err, c.PERMISSION_UPDATE_FAILED));
 
                 _load_permission(conn, roleId, rows[0]);
@@ -442,7 +439,6 @@ module.exports = (database) => {
         }
 
         function _load_permission(conn, roleId, resource) {
-
             const fields = [
                 database.binToUUID('r.id', 'role_id'),
                 'r.name AS role_name',
@@ -456,12 +452,17 @@ module.exports = (database) => {
                 'p.timestamp AS timestamp'
             ].join(', ');
 
+            const where = [
+                `s.id = ${database.uuidToBIN}`,
+                `p.role_id = ${database.uuidToBIN}`
+            ].join(' AND ');
+
             const query = `SELECT ${fields} FROM role r
                 INNER JOIN permission p ON p.role_id = r.id
                 INNER JOIN resource s ON s.id = p.resource_id
-                WHERE s.id = ${database.uuidToBIN(resourceId)} AND p.role_id = ${database.uuidToBIN(roleId)}`;
+                WHERE ${where}`;
 
-            conn.query(query, (err, rows) => {
+            conn.query(query, [resourceId, roleId], (err, rows) => {
                 if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.PERMISSION_UPDATE_FAILED));
 
                 _success_response(conn, { resource, permissions: rows });
@@ -469,7 +470,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             database.commit(conn, err => {
                 if (err) return helper.send400(null, res, err, c.PERMISSION_UPDATE_FAILED);
 
@@ -492,7 +492,6 @@ module.exports = (database) => {
         const order   = req.query.order || c.ORDER;
 
         function _proceed() {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -501,7 +500,6 @@ module.exports = (database) => {
         }
 
         function _get_item_count(conn) {
-
             let query = `SELECT COUNT(s.id) AS item_count FROM resource s`;
             let where = [], values = [];
 
@@ -527,7 +525,6 @@ module.exports = (database) => {
         }
 
         function _get_items(conn, item_count) {
-
             const data = {
                 item_count: item_count,
                 limit: limit,
@@ -581,7 +578,6 @@ module.exports = (database) => {
         }
 
         function _load_permission(conn, data) {
-
             const resources = data.hasOwnProperty('items') ? data.items : data;
 
             async.map(resources, __load_permission, (err, permissions) => {
@@ -597,7 +593,6 @@ module.exports = (database) => {
             });
 
             function __load_permission(element, next) {
-
                 const fields = [
                     database.binToUUID('r.id', 'role_id'),
                     'r.name AS role_name',
@@ -611,12 +606,17 @@ module.exports = (database) => {
                     'p.timestamp AS timestamp'
                 ].join(', ');
 
+                const where = [
+                    `s.id = ${database.uuidToBIN}`,
+                    `p.role_id = ${database.uuidToBIN}`
+                ].join(' AND ');
+
                 const query = `SELECT ${fields} FROM role r
                     INNER JOIN permission p ON p.role_id = r.id
                     INNER JOIN resource s ON s.id = p.resource_id
-                    WHERE s.id = ${database.uuidToBIN(element.id)} AND p.role_id = ${database.uuidToBIN(roleId)}`;
+                    WHERE ${where}`;
 
-                conn.query(query, (err, rows) => {
+                conn.query(query, [element.id, roleId], (err, rows) => {
                     if (err) return next(err);
 
                     const resource = {
@@ -630,7 +630,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.RESOURCE_FETCH_SUCCESS);
         }
 
