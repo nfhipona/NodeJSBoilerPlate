@@ -456,6 +456,7 @@ module.exports = (database, auth) => {
                 conn.query(query, [hash, decoded.id], (err, rows) => {
                     if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
                     
+                    auth.removeToken(decoded); // remove reset password token | prevent reuse
                     _prepare_mail(conn, record);
                 });
             });
