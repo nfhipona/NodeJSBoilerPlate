@@ -66,7 +66,7 @@ module.exports = (database, auth) => {
                     INNER JOIN role r ON r.id = u.role_id \
                     WHERE ${where}`;
 
-                conn.query(query, [data.username, data.username], (err, rows, _) => {
+                conn.query(query, [data.username, data.username], (err, rows) => {
                     if (err || rows.length === 0) return helper.send400(conn, res, err, c.USER_SIGNIN_FAILED);
 
                     _validate_password(conn, data, rows[0]);
@@ -94,33 +94,20 @@ module.exports = (database, auth) => {
             const query = `SELECT ${fields} FROM account a
                 WHERE a.user_id = ?`;
 
-            conn.query(query, [record.user_id], (err, rows, _) => {
+            conn.query(query, [record.user_id], (err, rows) => {
                 database.done(conn);
 
                 delete record.user_id; // remove binary id -- used only in query
                 const account = (rows && rows.length > 0) ? rows[0] : null;
                 const user_data = { user: record, account: account };
 
-                const token = _create_user_token(record, c.USER_TOKEN);
+                const token = auth.createPayloadToken(record, c.USER_TOKEN);
                 user_data.token_data = token;
 
                 req.user_data = user_data;
 
                 return next(); // proceed to login check
             });
-        }
-
-        function _create_user_token(record, type) {
-            const payload = {
-                type,
-                id: record.id,
-                role_id: record.role_id,
-                role_code: record.role_code,
-                role_name: record.role_name,
-                email: record.email
-            }
-            const token_options = { type, expiresIn: c.TOKEN_MAX_EXPIRY };
-            return auth.createToken(payload, token_options);
         }
 
         _proceed();
@@ -248,7 +235,7 @@ module.exports = (database, auth) => {
                 SET u.activated = 1 \
                 WHERE ${where}`;
 
-            conn.query(query, (err, rows, _) => {
+            conn.query(query, (err, rows) => {
                 if (err) return helper.send400(conn, res, err, c.USER_ACTIVATION_FAILED);
                 if (rows.changedRows === 0) {
                     const response_message = helper.errMsgData(400, 'Link has already expired or is no longer available.');
@@ -294,7 +281,7 @@ module.exports = (database, auth) => {
             const query = `SELECT ${fields} FROM user u \
                 WHERE ${where}`;
 
-            conn.query(query, [data.email], (err, rows, _) => {
+            conn.query(query, [data.email], (err, rows) => {
                 if (err) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
                 if (rows.length === 0) {
                     const response_message = helper.errMsgData(400, 'User does not exist and/or is no longer active.');
@@ -359,7 +346,7 @@ module.exports = (database, auth) => {
                 INNER JOIN role r ON r.id = u.role_id \
                 WHERE ${where}`;
 
-            conn.query(query, [data.email], (err, rows, _) => {
+            conn.query(query, [data.email], (err, rows) => {
                 if (err) return helper.send400(conn, res, err, c.USER_FORGOT_PW_FAILED);
                 if (rows.length === 0) {
                     const response_message = helper.errMsgData(400, 'User does not exist and/or is no longer active.');
@@ -448,7 +435,7 @@ module.exports = (database, auth) => {
             const query = `SELECT ${fields} FROM user u \
                 WHERE ${where}`;
 
-            conn.query(query, (err, rows, _) => {
+            conn.query(query, (err, rows) => {
                 if (err) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
                 if (rows.length === 0) {
                     const response_message = helper.errMsgData(400, 'User does not exist and/or is no longer active.');
