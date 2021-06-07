@@ -249,10 +249,11 @@ module.exports = (database, auth) => {
     }
 
     function change_pw(req, res) {
+        const decoded = req.get('decoded_token');
+
         function _proceed() {
             const data = req.body;
             const form = {
-                email: '',
                 password: ''
             };
             
@@ -273,7 +274,7 @@ module.exports = (database, auth) => {
             ].join(', ');
 
             const where = [
-                'u.email = ?',
+                `u.id = ${database.uuidToBIN}`,
                 'u.activated = 1',
                 'u.deleted <> 1'
             ].join(' AND ');
@@ -281,7 +282,7 @@ module.exports = (database, auth) => {
             const query = `SELECT ${fields} FROM user u \
                 WHERE ${where}`;
 
-            conn.query(query, [data.email], (err, rows) => {
+            conn.query(query, [decoded.id], (err, rows) => {
                 if (err) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
                 if (rows.length === 0) {
                     const response_message = helper.errMsgData(400, 'User does not exist and/or is no longer active.');
@@ -296,9 +297,9 @@ module.exports = (database, auth) => {
             exports._encrypt_password(data.password, (err, hash) => {
                 const query = `UPDATE user u \
                     SET u.password = ? \
-                    WHERE u.email = ?`;
+                    WHERE u.id = ?`;
 
-                conn.query(query, [hash, data.email], (err, rows) => {
+                conn.query(query, [hash, record.user_id], (err, rows) => {
                     if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
                     
                     helper.send200(conn, res, null, c.USER_CHANGE_PW_SUCCESS);
