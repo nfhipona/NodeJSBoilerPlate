@@ -80,3 +80,6 @@ exports.USER_CHANGE_PW_SUCCESS      = 'User password changed';
 exports.USER_CHANGE_PW_FAILED       = 'User password change failed';
 exports.USER_FORGOT_PW_SUCCESS      = 'User password reset request';
 exports.USER_FORGOT_PW_FAILED       = 'User password reset request failed';
+exports.USER_ACCOUNT_CREATE_SUCCESS = 'User account created';
+exports.USER_ACCOUNT_CREATE_FAILED  = 'User account create failed';
+
