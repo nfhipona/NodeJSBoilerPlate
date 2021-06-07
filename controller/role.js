@@ -49,9 +49,9 @@ module.exports = (database) => {
             ].join(', ');
 
             const query = `SELECT ${fields} FROM role r
-                WHERE r.id = ${database.uuidToBIN(uuID)}`;
+                WHERE r.id = ${database.uuidToBIN}`;
 
-            conn.query(query, (err, rows) => {
+            conn.query(query, [uuID], (err, rows) => {
                 if (err) return helper.send400(conn, res, err, c.ROLE_CREATE_FAILED);
 
                 _success_response(conn, rows[0]);
@@ -91,9 +91,9 @@ module.exports = (database) => {
 
                 const set_query = database.format(form, data);
                 const query = `UPDATE role SET ${set_query}
-                    WHERE id = ${database.uuidToBIN(uuID)}`;
+                    WHERE id = ${database.uuidToBIN}`;
 
-                conn.query(query, (err, rows) => {
+                conn.query(query, [uuID], (err, rows) => {
                     if (err || rows.affectedRows == 0) return helper.send400(conn, res, err, c.ROLE_UPDATE_FAILED);
 
                     _load_role(conn);
@@ -109,9 +109,9 @@ module.exports = (database) => {
             ].join(', ');
 
             const query = `SELECT ${fields} FROM role r
-                WHERE r.id = ${database.uuidToBIN(uuID)}`;
+                WHERE r.id = ${database.uuidToBIN}`;
 
-            conn.query(query, (err, rows) => {
+            conn.query(query, [uuID], (err, rows) => {
                 if (err) return helper.send400(conn, res, err, c.ROLE_UPDATE_FAILED);
 
                 _success_response(conn, rows[0]);
@@ -147,9 +147,9 @@ module.exports = (database) => {
             ].join(', ');
 
             const query = `SELECT ${fields} FROM role r
-                WHERE r.deleted <> 1 AND r.id = ${database.uuidToBIN(roleId)}`;
+                WHERE r.deleted <> 1 AND r.id = ${database.uuidToBIN}`;
 
-            conn.query(query, (err, rows) => {
+            conn.query(query, [roleId], (err, rows) => {
                 if (err || rows.length == 0) return helper.send400(conn, res, err, c.ROLE_FETCH_FAILED);
 
                 _success_response(conn, rows[0]);
@@ -274,9 +274,9 @@ module.exports = (database) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
                 const query = `UPDATE role SET deleted = 1 \
-                    WHERE id = ${database.uuidToBIN(uuID)}`;
+                    WHERE id = ${database.uuidToBIN}`;
 
-                conn.query(query, (err, rows) => {
+                conn.query(query, [uuID], (err, rows) => {
                     if (err || rows.changedRows === 0) return helper.send400(conn, res, err, c.ROLE_DELETE_FAILED);
 
                     _success_response(conn);
