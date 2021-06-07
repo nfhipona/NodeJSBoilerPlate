@@ -157,7 +157,7 @@ module.exports = (database, auth) => {
                 const query = `INSERT INTO user SET ${set_query}`;
 
                 conn.query(query, (err, rows) => {
-                    if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_CREATE_FAILED));
+                    if (err || rows.affectedRows === 0) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_CREATE_FAILED));
 
                     _prepare_mail(conn, data);
                 });
