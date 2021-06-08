@@ -44,12 +44,12 @@ module.exports = (database) => {
                 WHERE ${where}`;
 
             conn.query(query, [1, data.is_down], (err, rows) => {
-                if (err || rows.length > 0) return database.rollback(conn, () => helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED));
+                const response_message = helper.errMsgData(400, 'Could not set while another maintenance window is active.');
+                if (err || rows.length > 0) return database.rollback(conn, () => helper.send400(null, res, err || response_message, c.MAINTENANCE_SET_FAILED));
 
                 _set_maintenance(conn, data); // proceed normally
             });
         }
-
 
         function _set_maintenance(conn, data) {
             const data_cp = { ...data, id: 1 }; // set id:1 - to make sure only 1 entry is created
