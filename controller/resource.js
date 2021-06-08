@@ -232,7 +232,7 @@ module.exports = (database) => {
                 query += ` WHERE ${where.join(' AND ')}`;
             }
 
-            if (order.isEqualToStr('desc')) {
+            if (order.isEqualTo('desc')) {
                 query += ` ORDER BY s.name ${order}`;
             }else{
                 query += ` ORDER BY s.name`;
@@ -391,7 +391,8 @@ module.exports = (database) => {
                 const accessObjEnabled = { ...accessObj, is_disabled: 0 };
 
                 const set_query = database.format(form, accessObjEnabled);
-                const query = `INSERT INTO permission SET ${set_query}
+                const query = `INSERT INTO permission \
+                    SET ${set_query}
                     ON DUPLICATE KEY UPDATE ${set_query}`;
 
                 conn.query(query, (err, rows) => {
@@ -481,7 +482,6 @@ module.exports = (database) => {
     }
 
     function retrieve_permission(req, res) {
-
         const roleId  = req.params.roleId;
         const q       = req.query.q;
         const deleted = req.query.deleted;
@@ -558,7 +558,7 @@ module.exports = (database) => {
                 query += ` WHERE ${where.join(' AND ')}`;
             }
 
-            if (order.isEqualToStr('desc')) {
+            if (order.isEqualTo('desc')) {
                 query += ` ORDER BY s.name ${order}`;
             }else{
                 query += ` ORDER BY s.name`;

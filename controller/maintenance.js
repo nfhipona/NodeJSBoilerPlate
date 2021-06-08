@@ -207,7 +207,7 @@ module.exports = (database) => {
                 query += ` WHERE ${where.join(' AND ')}`;
             }
 
-            if (order.isEqualToStr('desc')) {
+            if (order.isEqualTo('desc')) {
                 query += ` ORDER BY h.timestamp ${order}`;
             }else{
                 query += ` ORDER BY h.timestamp`;

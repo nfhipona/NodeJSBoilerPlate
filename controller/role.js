@@ -262,7 +262,8 @@ module.exports = (database) => {
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
-                const query = `UPDATE role SET deleted = 1 \
+                const query = `UPDATE role \
+                    SET deleted = 1 \
                     WHERE id = ${database.uuidToBIN}`;
 
                 conn.query(query, [uuID], (err, rows) => {
