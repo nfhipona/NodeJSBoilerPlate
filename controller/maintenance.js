@@ -7,7 +7,6 @@ const c             = require(__dirname + '/../config/constant.js');
 module.exports = (database) => {
 
     function set(req, res)    {
-
         const uuID = uuid();
 
         function _proceed() {
@@ -26,7 +25,6 @@ module.exports = (database) => {
         }
 
         function _begin(data) {
-
             database.transaction((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -35,11 +33,15 @@ module.exports = (database) => {
         }
 
         function _check_if_down(conn, data) {
+            const where = [
+                `id = ?`,
+                `is_down = ?`
+            ].join(' AND ');
 
             // check if the current status is same as previous
             // prevent duplicate entry in maintenance history
             const query = `SELECT * FROM maintenance
-                WHERE id = ? AND is_down = ?`;
+                WHERE ${where}`;
 
             conn.query(query, [1, data.is_down], (err, rows) => {
                 if (err || rows.length > 0) return database.rollback(conn, () => helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED));
@@ -50,10 +52,10 @@ module.exports = (database) => {
 
 
         function _set_maintenance(conn, data) {
-
             const data_cp = { ...data, id: 1 }; // set id:1 - to make sure only 1 entry is created
 
-            const query = `INSERT INTO maintenance SET ?
+            const query = `INSERT INTO maintenance \
+                SET ?
                 ON DUPLICATE KEY UPDATE ?`;
 
             conn.query(query, [data_cp, data_cp], (err, rows) => {
@@ -64,7 +66,6 @@ module.exports = (database) => {
         }
 
         function _create_history(conn, data) {
-
             const form = {
                 id: 'uuid',
                 title: '',
@@ -78,7 +79,8 @@ module.exports = (database) => {
             const history = { status, ...d, id: uuID };
 
             const set_query = database.format(form, history);
-            const query = `INSERT INTO maintenance_history SET ${set_query}`;
+            const query = `INSERT INTO maintenance_history \
+                SET ${set_query}`;
 
             conn.query(query, (err, rows) => {
                 if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED));
@@ -88,7 +90,6 @@ module.exports = (database) => {
         }
 
         function _load_info(conn, infoId) {
-
             const query = `SELECT * FROM maintenance
                 WHERE id = ?`;
 
@@ -100,7 +101,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             database.commit(conn, err => {
                 if (err) return helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED);
 
@@ -112,9 +112,7 @@ module.exports = (database) => {
     }
 
     function info(req, res) {
-
         function _proceed() {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -131,7 +129,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.MAINTENANCE_INFO_FETCH_SUCCESS);
         }
 
@@ -139,7 +136,6 @@ module.exports = (database) => {
     }
 
     function retrieve_history(req, res) {
-
         const q       = req.query.q;
 
         const limit   = Number(req.query.limit) || c.LIMIT;
@@ -148,7 +144,6 @@ module.exports = (database) => {
         const order   = req.query.order || c.ORDER;
 
         function _proceed() {
-
             database.connection((err, conn) => {
                 if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
@@ -157,7 +152,6 @@ module.exports = (database) => {
         }
 
         function _get_item_count(conn) {
-
             let query = `SELECT COUNT(h.id) AS item_count FROM maintenance_history h`;
             let where = [], values = [];
 
@@ -178,7 +172,6 @@ module.exports = (database) => {
         }
 
         function _get_items(conn, item_count) {
-
             const data = {
                 item_count: item_count,
                 limit: limit,
@@ -227,7 +220,6 @@ module.exports = (database) => {
         }
 
         function _success_response(conn, data) {
-
             helper.send200(conn, res, data, c.MAINTENANCE_HISTORY_FETCH_SUCCESS);
         }
 
