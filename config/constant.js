@@ -17,7 +17,7 @@ exports.SERVER_WELCOME      = "Welcome, the server is up and running"
 exports.SERVER_NO_CONTENT   = "No Content"
 exports.SERVER_UP_STATUS    = 'SERVER_UP';
 exports.SERVER_DOWN_STATUS  = 'SERVER_DOWN';
-exports.SERVER_MAINTENANCE  = 'Maintenance: Server is undergoing service upgrade. Please return later';
+exports.SERVER_MAINTENANCE  = 'The server is currently undergoing system maintenance. Please try again later.';
 
 /** APP RESOURCES */
 exports.RESOURCE_CREATE_FAILED = 'Could not create resource';
