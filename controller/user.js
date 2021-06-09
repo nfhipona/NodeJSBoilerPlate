@@ -15,6 +15,7 @@ const mailOptionsSignUp             = config.mailOptionsSignUp;
 const mailOptionsUserInvite         = config.mailOptionsUserInvite;
 const mailOptionsPWDReset           = config.mailOptionsPWDReset;
 const mailOptionsPWDResetConfirm    = config.mailOptionsPWDResetConfirm;
+const mailOptionsConfirmedAccount   = config.mailOptionsConfirmedAccount;
 
 const api_host = config.envConfig.use('api');
 const web_host = config.envConfig.use('web');
@@ -167,7 +168,7 @@ module.exports = (database, auth) => {
             const email_validation_link = _create_email_validation_link(data, token);
             const from = mailOptionsSignUp.from;
             const subject = mailOptionsSignUp.subject;
-            const html = mailOptionsSignUp.html(email_validation_link);
+            const html = mailOptionsSignUp.html(email, email_validation_link);
             const options = exports._create_mail_options(from, email, subject, html);
 
             if (isDev) {
@@ -241,8 +242,31 @@ module.exports = (database, auth) => {
                     const response_message = helper.errMsgData(400, 'Link has already expired or is no longer available.');
                     return helper.send400(conn, res, response_message, c.USER_ACTIVATION_FAILED);
                 }
-                helper.send200(conn, res, decodedObj, c.USER_ACTIVATION_SUCCESS);
+
+                _prepare_mail(conn, decodedObj);
             });
+        }
+
+        function _prepare_mail(conn, record) {
+            const email = record.email;
+            const from = mailOptionsConfirmedAccount.from;
+            const subject = mailOptionsConfirmedAccount.subject;
+            const html = mailOptionsConfirmedAccount.html(email);
+            const options = exports._create_mail_options(from, email, subject, html);
+            
+            if (isDev) {
+                transporter.sendMail(options, (success, res_data) => {
+                    if (success) {
+                        helper.send200(conn, res, record, c.USER_ACTIVATION_SUCCESS);
+                    }else{
+                        helper.send400(conn, res, res_data.error, c.USER_ACTIVATION_FAILED)
+                    }
+                });
+            }else{
+                // :- Send only
+                transporter.sendOnly(options);
+                helper.send200(conn, res, record, c.USER_ACTIVATION_SUCCESS);
+            }
         }
 
         _proceed();

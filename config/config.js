@@ -92,8 +92,8 @@ exports.bcryptConfig = {
 exports.mailOptionsSignUp = {
     from: `${pjson.app_name} <${this.mailAuth.user}>`,
     subject: `${pjson.app_name} - New Account`,
-    html: (url) => {
-        return `<br/>Hi, \
+    html: (email, url) => {
+        return `<br/>Hi ${email}, \
         <br/><br/>You applied for a new account at ${pjson.app_name}. \
         <br/><br/><b><a href=\"${url}\">Please click here to confirm your account.</a></b> \
         <br/><br/>This will expire after two hours. \
@@ -107,8 +107,8 @@ exports.mailOptionsUserInvite = {
     subject: (name) => {
         return `Invitation to ${name}`;
     },
-    html: (url) => {
-        return `<br/>Hi, \
+    html: (email, url) => {
+        return `<br/>Hi ${email}, \
         <br/><br/>You applied for a new account at ${pjson.app_name}. \
         <br/><br/><b><a href=\"${url}\">Please click here to confirm your account.</a></b> \
         <br/><br/>This will expire after two hours. \
@@ -136,6 +136,17 @@ exports.mailOptionsPWDResetConfirm = {
     html: (email) => {
         return `<br/>Hi ${email}, \
         <br/><br/>Your account password at <b>${pjson.app_name}</b> has been updated. \
+        <br/><br/>Kind regards, \
+        <br/>The ${pjson.app_name} team`;
+    }
+}
+
+exports.mailOptionsConfirmedAccount = {
+    from: `${pjson.app_name} <${this.mailAuth.user}>`,
+    subject: `${pjson.app_name} - Welcome Aboard`,
+    html: (email) => {
+        return `<br/>Hi ${email}, \
+        <br/><br/>Your account with <b>${pjson.app_name}</b> has been confirmed. \
         <br/><br/>Kind regards, \
         <br/>The ${pjson.app_name} team`;
     }
