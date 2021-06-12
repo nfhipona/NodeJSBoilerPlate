@@ -211,8 +211,6 @@ exports.cors = {
  * MULTER SETTINGS
  */
 exports.imageFilter = (req, file, cb) => {
-    console.log('multer filter: ', file);
-
     // Accept images only
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
         return cb(new Error('Unsupported file type.'), false);
@@ -221,17 +219,22 @@ exports.imageFilter = (req, file, cb) => {
 };
 
 exports.multer = (path, filter) => {
-    const temp  = `${os.tmpdir()}/${path}}`;
-    console.log('temp: ', temp);
-
+    const tempPath  = `${os.tmpdir()}/${path}`;
+    fs.mkdirSync(tempPath, { recursive: true }); // creates temp dir if does not exists to prevent errors
+    
+    // Ex. of .file
+    // {
+    //     fieldname: 'avatar',
+    //     originalname: 'FILE_NAME.png',
+    //     encoding: '7bit',
+    //     mimetype: 'image/png'
+    // }
     const diskStorage = multer.diskStorage({
         destination: (req, file, cb) => {
-            console.log('multer destination: ', file);
-            cb(null, path);
+            cb(null, tempPath);
         },
         filename: (req, file, cb) => {
-            console.log('multer filename: ', file);
-            cb(null, file.fieldname);
+            cb(null, `${file.fieldname}-${Date.now()}`);
         }
     });
 
