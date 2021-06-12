@@ -1,7 +1,7 @@
 'use strict';
 
 const util      = require(__dirname + '/../lib/util.js');
-const c         = require(__dirname + '/../lib/util.js');
+const c         = require(__dirname + '/../config/constant.js');
 const cluster   = require("cluster");
 
 exports.validateBody = (form, source, res, next) => {
