@@ -210,7 +210,7 @@ exports.cors = {
 /**
  * MULTER SETTINGS
  */
-exports.imageFilter = (req, file, cb) => {
+exports.imageFilter = function (req, file, cb) {
     // Accept images only
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
         const response_message = helper.errMsgData(400, 'Unsupported file type.');
@@ -231,10 +231,10 @@ exports.multer = (path, filter) => {
     //     mimetype: 'image/png'
     // }
     const diskStorage = multer.diskStorage({
-        destination: (req, file, cb) => {
+        destination: function (req, file, cb) {
             cb(null, tempPath);
         },
-        filename: (req, file, cb) => {
+        filename: function (req, file, cb) {
             cb(null, `${file.fieldname}-${Date.now()}`);
         }
     });
