@@ -213,7 +213,8 @@ exports.cors = {
 exports.imageFilter = (req, file, cb) => {
     // Accept images only
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
-        return cb(new Error('Unsupported file type.'), false);
+        const response_message = helper.errMsgData(400, 'Unsupported file type.');
+        return cb(response_message, false);
     }
     cb(null, true);
 };

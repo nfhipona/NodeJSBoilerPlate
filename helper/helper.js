@@ -109,6 +109,9 @@ exports.checkError = (err, errCode = 400) => {
             return { code: 500, error: 'Internal server error.' };
         }
     }
+
+    delete err.storageErrors; // remove storage errors from multer
+
     return err || null;
 };
 
