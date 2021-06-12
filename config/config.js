@@ -5,6 +5,8 @@ require("dotenv").config();
 const helper        = require(__dirname + '/../helper/helper.js');
 const pjson         = require(__dirname + '/../package.json');
 
+const multer        = require('multer');
+const os            = require('os');
 const fs            = require('fs');
 const path          = require('path');
 
@@ -13,6 +15,9 @@ const env = process.env;
 
 helper.log(`NODE_ENV: ${env.NODE_ENV} -- version: ${pjson.version}`);
 
+/**
+ * ENV FLAGS
+ */
 exports.isDebug = () => {
     const isDev = env.NODE_ENV.toLocaleLowerCase() === 'development' || env.NODE_ENV.toLocaleLowerCase() === 'staging';
     return isDev;
@@ -28,6 +33,9 @@ exports.isStage = () => {
     return isStage;
 }
 
+/**
+ * DATABASE CONFIG
+ */
 exports.dbConfigAll = {
     development: helper.parseSettingsConfig(env.DATABASE_DEV_URL),
     development_test: helper.parseSettingsConfig(env.DATABASE_DEV_TEST_URL),
@@ -42,6 +50,9 @@ exports.dbConfigAll = {
 exports.dbConfig        = this.dbConfigAll.use();
 exports.dbTestConfig    = this.isDev() ? this.dbConfigAll['development'] : this.dbConfigAll['development_test'];
 
+/**
+ * CERT SETTINGS
+ */
 let key, cert;
 const keyFile = 'certificate.key';
 const cerFile = 'certificate.crt';
@@ -60,6 +71,9 @@ try {
 
 exports.certificate         = { key: key, cert: cert };
 
+/**
+ * ENV SETTINGS
+ */
 exports.serverConfig        = helper.parseSettingsConfig(env.SERVER_CONFIG);
 exports.jwtConfig           = helper.parseSettingsConfig(env.JWT_CONFIG);
 exports.socketConfig        = helper.parseSettingsConfig(env.SOCKET_CONFIG);
@@ -71,6 +85,8 @@ exports.mailConfig          = helper.parseSettingsConfig(env.MAIL_CONFIG);
 exports.development         = helper.parseSettingsConfig(env.DEVELOPMENT_ENV);
 exports.staging             = helper.parseSettingsConfig(env.STAGING_ENV);
 exports.production          = helper.parseSettingsConfig(env.PRODUCTION_ENV);
+
+exports.imagePath           = helper.parseSettingsConfig(env.IMAGE_FILE_PATH);
 
 exports.envConfig = {
     development: this.development,
@@ -89,6 +105,9 @@ exports.bcryptConfig = {
     rounds: 10
 };
 
+/**
+ * MAIL SETTINGS
+ */
 exports.mailOptionsSignUp = {
     from: `${pjson.app_name} <${this.mailAuth.user}>`,
     subject: `${pjson.app_name} - New Account`,
@@ -158,6 +177,9 @@ exports.transporterSettings = () => {
     return settings;
 }
 
+/**
+ * CORS CONFIG
+ */
 exports.cors = {
     allow_credentials: true,
     hosts: [
@@ -183,4 +205,36 @@ exports.cors = {
         'x-access-token',
         'Lang'
     ]
+}
+
+/**
+ * MULTER SETTINGS
+ */
+exports.imageFilter = (req, file, cb) => {
+    console.log('multer filter: ', file);
+
+    // Accept images only
+    if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
+        return cb(new Error('Unsupported file type.'), false);
+    }
+    cb(null, true);
+};
+
+exports.multer = (path, filter) => {
+    const temp  = `${os.tmpdir()}/${path}}`;
+    console.log('temp: ', temp);
+
+    const diskStorage = multer.diskStorage({
+        destination: (req, file, cb) => {
+            console.log('multer destination: ', file);
+            cb(null, path);
+        },
+        filename: (req, file, cb) => {
+            console.log('multer filename: ', file);
+            cb(null, file.fieldname);
+        }
+    });
+
+    const upload = multer({ storage: diskStorage, fileFilter: filter });
+    return upload;
 }
