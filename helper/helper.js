@@ -113,7 +113,7 @@ exports.checkError = (err, errCode = 400) => {
         }
     }
 
-    delete err.storageErrors; // remove storage errors from multer
+    if (err) delete err.storageErrors; // remove storage errors from multer
 
     return err || null;
 };

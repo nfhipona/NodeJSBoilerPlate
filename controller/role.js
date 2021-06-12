@@ -147,7 +147,7 @@ module.exports = (database) => {
                 WHERE ${where}`;
 
             conn.query(query, [roleId], (err, rows) => {
-                if (err || rows.length == 0) return helper.send400(conn, res, err, c.ROLE_FETCH_FAILED);
+                if (err || rows.length === 0) return helper.send400(conn, res, err, c.ROLE_FETCH_FAILED);
 
                 _success_response(conn, rows[0]);
             });
