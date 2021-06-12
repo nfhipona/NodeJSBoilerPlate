@@ -19,9 +19,9 @@ exports.validateBody = (form, source, res, next) => {
 };
 
 /** RESPONSE HANDLER */
-exports.send = (code) => (conn, res, data, context) => {
+exports.send = (code, success = true) => (conn, res, data, context) => {
     if (conn) conn.release();
-    const responseData = this.responseData(true, context, data);
+    const responseData = this.responseData(success, context, data);
 	this.sendResponse(res, code, responseData);
 }
 
@@ -31,32 +31,32 @@ exports.send200 = (conn, res, data, context) => {
 
 exports.send400 = (conn, res, err, context) => {
     const error_data = this.checkError(err);
-    this.send(400)(conn, res, error_data, context);
+    this.send(400, false)(conn, res, error_data, context);
 }
 
 exports.send401 = (conn, res, err, context) => {
     const error_data = this.checkError(err, 401);
-    this.send(401)(conn, res, error_data, context);
+    this.send(401, false)(conn, res, error_data, context);
 }
 
 exports.send403 = (conn, res, err, context) => {
     const error_data = this.checkError(err, 403);
-    this.send(403)(conn, res, error_data, context);
+    this.send(403, false)(conn, res, error_data, context);
 }
 
 exports.send404 = (conn, res, err, context) => {
     const error_data = this.checkError(err, 404);
-    this.send(404)(conn, res, error_data, context);
+    this.send(404, false)(conn, res, error_data, context);
 }
 
 exports.send500 = (conn, res, err, context) => {
     const error_data = this.checkError(err, 500);
-    this.send(500)(conn, res, error_data, context);
+    this.send(500, false)(conn, res, error_data, context);
 }
 
 exports.send503 = (conn, res, err, context) => {
     const error_data = this.checkError(err, 503);
-    this.send(503)(conn, res, error_data, context);
+    this.send(503, false)(conn, res, error_data, context);
 }
 
 exports.sendError = (conn, res, err, context) => {
