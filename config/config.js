@@ -219,8 +219,8 @@ exports.imageFilter = function (req, file, cb) {
     cb(null, true);
 };
 
-exports.multer = (path, filter) => {
-    const tempPath  = `${os.tmpdir()}/${path}`;
+exports.multer = (folder_path, filter) => {
+    const tempPath  = `${os.tmpdir()}/${folder_path}`;
     fs.mkdirSync(tempPath, { recursive: true }); // creates temp dir if does not exists to prevent errors
     
     // Ex. of .file
@@ -235,7 +235,9 @@ exports.multer = (path, filter) => {
             cb(null, tempPath);
         },
         filename: function (req, file, cb) {
-            cb(null, `${file.fieldname}-${Date.now()}`);
+            const extension = path.extname(file.originalname);
+            const filename = `${file.fieldname}-${Date.now()}${extension}`;
+            cb(null, filename);
         }
     });
 
