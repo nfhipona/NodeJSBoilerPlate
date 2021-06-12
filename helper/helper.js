@@ -107,6 +107,8 @@ exports.checkError = (err, errCode = 400) => {
             return { code: 500, error: 'Internal server error.' };
         } else if (err.sql) {
             return { code: 500, error: 'Internal server error.' };
+        } else if (code === 'LIMIT_UNEXPECTED_FILE') {
+            return { code: 400, error: 'Invalid file key.' };
         }
     }
 
