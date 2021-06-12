@@ -10,7 +10,8 @@ exports.validateBody = (form, source, res, next) => {
         .from(source);
 
     if (data instanceof Error) {
-        const responseData = this.responseData(false, c.BAD_PARAMETERS, data.message);
+        const response_message = this.errMsgData(400, data.message);
+        const responseData = this.responseData(false, c.BAD_PARAMETERS, response_message);
         return this.sendResponse(res, 400, responseData);
     }
 
