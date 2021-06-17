@@ -27,9 +27,9 @@ PRODUCTION_ENV=web::https://yourdomain.com&api::https://api.yourdomain.com
 
 IMAGE_FILE_PATH=path::nodejsboilerplate/image_files/
 
-AWS_CONFIG_DEV=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY
-AWS_CONFIG_STAGING=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY
-AWS_CONFIG_PRODUCTION=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY
+AWS_CONFIG_DEV=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY&profile::boilerplate-development
+AWS_CONFIG_STAGING=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY&profile::boilerplate-staging
+AWS_CONFIG_PRODUCTION=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY&profile::boilerplate-production
 
 ## License
 
