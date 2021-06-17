@@ -36,11 +36,15 @@ exports.isStage = () => {
 /**
  * DATABASE CONFIG
  */
+const dbDevelopment        = helper.parseSettingsConfig(env.DATABASE_DEV_URL);
+const dbDevelopmentTest    = helper.parseSettingsConfig(env.DATABASE_DEV_TEST_URL);
+const dbStaging            = helper.parseSettingsConfig(env.DATABASE_STAGING_URL);
+const dbProduction         = helper.parseSettingsConfig(env.DATABASE_PRODUCTION_URL);
 exports.dbConfigAll = {
-    development: helper.parseSettingsConfig(env.DATABASE_DEV_URL),
-    development_test: helper.parseSettingsConfig(env.DATABASE_DEV_TEST_URL),
-    staging: helper.parseSettingsConfig(env.DATABASE_STAGING_URL),
-    production: helper.parseSettingsConfig(env.DATABASE_PRODUCTION_URL),
+    development: dbDevelopment,
+    development_test: dbDevelopmentTest,
+    staging: dbStaging,
+    production: dbProduction,
     use: () => {
         const config = this.dbConfigAll[env.NODE_ENV];
         return config;
@@ -88,16 +92,34 @@ exports.production          = helper.parseSettingsConfig(env.PRODUCTION_ENV);
 
 exports.imagePath           = helper.parseSettingsConfig(env.IMAGE_FILE_PATH);
 
+const envDevelopment        = helper.parseSettingsConfig(env.DEVELOPMENT_ENV);
+const envStaging            = helper.parseSettingsConfig(env.STAGING_ENV);
+const envProduction         = helper.parseSettingsConfig(env.PRODUCTION_ENV);
 exports.envConfig = {
-    development: this.development,
-    staging: this.staging,
-    production: this.production,
+    development: envDevelopment,
+    staging: envStaging,
+    production: envProduction,
     use: (type) => {
         const config = this.envConfig[env.NODE_ENV];
         return config[type];
     },
     test: (host = 'http://127.0.0.1', port = '7746') => {
         return `${host}:${port}`;
+    }
+}
+
+exports.imagePath           = helper.parseSettingsConfig(env.IMAGE_FILE_PATH);
+
+const awsDevelopment        = helper.parseSettingsConfig(env.AWS_CONFIG_DEV);
+const awsStaging            = helper.parseSettingsConfig(env.AWS_CONFIG_STAGING);
+const awsProduction         = helper.parseSettingsConfig(env.AWS_CONFIG_PRODUCTION);
+exports.awsConfig = {
+    development: awsDevelopment,
+    staging: awsStaging,
+    production: awsProduction,
+    use: () => {
+        const config = this.awsConfig[env.NODE_ENV];
+        return config;
     }
 }
 
