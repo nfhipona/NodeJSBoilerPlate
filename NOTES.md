@@ -25,6 +25,12 @@ DEVELOPMENT_ENV=web::http://127.0.0.1:3000&api::http://127.0.0.1:6477
 STAGING_ENV=web::https://staging.yourdomain.com&api::https://api-staging.yourdomain.com
 PRODUCTION_ENV=web::https://yourdomain.com&api::https://api.yourdomain.com
 
+IMAGE_FILE_PATH=path::nodejsboilerplate/image_files/
+
+AWS_CONFIG_DEV=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY
+AWS_CONFIG_STAGING=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY
+AWS_CONFIG_PRODUCTION=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY
+
 ## License
 
 SAMS API is available under the MIT license. See the [LICENSE](https://bitbucket.org/nferocious76/sams-api/src/master/LICENSE) file for more info.
