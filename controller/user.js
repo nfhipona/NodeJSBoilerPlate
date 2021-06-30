@@ -239,7 +239,7 @@ module.exports = (database, auth) => {
             conn.query(query, [decoded.id], (err, rows) => {
                 if (err) return helper.send400(conn, res, err, c.USER_ACTIVATION_FAILED);
                 if (rows.changedRows === 0) {
-                    const response_message = helper.errMsgData(400, 'Link has already expired or is no longer available.');
+                    const response_message = helper.errMsgData(400, 'Link is either expired or invalid.');
                     return helper.send400(conn, res, response_message, c.USER_ACTIVATION_FAILED);
                 }
 
