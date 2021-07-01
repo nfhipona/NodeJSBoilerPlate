@@ -162,7 +162,7 @@ module.exports = (database) => {
 
     function fetch_multiple(req, res) {
         const q = req.query.q;
-        const deleted = req.query.deleted;
+        const deleted = req.query.deleted || c.DELETED;
 
         const limit   = Number(req.query.limit) || c.LIMIT;
         const page    = (Number(req.query.page) || 1);

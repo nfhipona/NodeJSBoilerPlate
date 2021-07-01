@@ -10,6 +10,7 @@ exports.RESET_PW_TOKEN = 'reset_password_token';
 
 /** DEFAULT QUERY LIMIT */
 exports.LIMIT = 0;
+exports.DELETED = '0';
 exports.ORDER = 'DESC';
 
 /** SERVER */
