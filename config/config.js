@@ -36,10 +36,10 @@ exports.isStage = () => {
 /**
  * DATABASE CONFIG
  */
-const dbDevelopment        = helper.parseSettingsConfig(env.DATABASE_DEV_URL);
-const dbDevelopmentTest    = helper.parseSettingsConfig(env.DATABASE_DEV_TEST_URL);
-const dbStaging            = helper.parseSettingsConfig(env.DATABASE_STAGING_URL);
-const dbProduction         = helper.parseSettingsConfig(env.DATABASE_PRODUCTION_URL);
+const dbDevelopment         = helper.parseSettingsConfig(env.DATABASE_DEV_URL);
+const dbDevelopmentTest     = helper.parseSettingsConfig(env.DATABASE_DEV_TEST_URL);
+const dbStaging             = helper.parseSettingsConfig(env.DATABASE_STAGING_URL);
+const dbProduction          = helper.parseSettingsConfig(env.DATABASE_PRODUCTION_URL);
 exports.dbConfigAll = {
     development: dbDevelopment,
     development_test: dbDevelopmentTest,
@@ -51,8 +51,8 @@ exports.dbConfigAll = {
     }
 }
 
-exports.dbConfig        = this.dbConfigAll.use();
-exports.dbTestConfig    = this.isDev() ? this.dbConfigAll['development'] : this.dbConfigAll['development_test'];
+exports.dbConfig            = this.dbConfigAll.use();
+exports.dbTestConfig        = this.isDev() ? this.dbConfigAll['development'] : this.dbConfigAll['development_test'];
 
 /**
  * CERT SETTINGS
@@ -110,18 +110,37 @@ exports.envConfig = {
 
 exports.imagePath           = helper.parseSettingsConfig(env.IMAGE_FILE_PATH);
 
+/**
+ * AWS SETTINGS
+ */
 const awsDevelopment        = helper.parseSettingsConfig(env.AWS_CONFIG_DEV);
 const awsStaging            = helper.parseSettingsConfig(env.AWS_CONFIG_STAGING);
 const awsProduction         = helper.parseSettingsConfig(env.AWS_CONFIG_PRODUCTION);
-exports.awsConfig = {
+exports.awsEnvConfig = {
     development: awsDevelopment,
     staging: awsStaging,
     production: awsProduction,
     use: () => {
-        const config = this.awsConfig[env.NODE_ENV];
+        const config = this.awsEnvConfig[env.NODE_ENV];
         return config;
     }
 }
+exports.awsConfig           = this.awsEnvConfig.use();
+
+const awsBucketDevelopment  = helper.parseSettingsConfig(env.AWS_BUCKET_DEV);
+const awsBucketStaging      = helper.parseSettingsConfig(env.AWS_BUCKET_STAGING);
+const awsBucketProduction   = helper.parseSettingsConfig(env.AWS_BUCKET_PRODUCTION);
+exports.awsBucketConfig = {
+    development: awsBucketDevelopment,
+    staging: awsBucketStaging,
+    production: awsBucketProduction,
+    use: () => {
+        const config = this.awsBucketConfig[env.NODE_ENV];
+        return config;
+    }
+}
+exports.awsBucket           = this.awsBucketConfig.use();
+exports.awsBucketPath       = helper.parseSettingsConfig(env.AWS_BUCKET_PATH);
 
 exports.bcryptConfig = {
     rounds: 10

@@ -27,9 +27,15 @@ PRODUCTION_ENV=web::https://yourdomain.com&api::https://api.yourdomain.com
 
 IMAGE_FILE_PATH=path::nodejsboilerplate/image_files/
 
-AWS_CONFIG_DEV=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY&profile::boilerplate-development
-AWS_CONFIG_STAGING=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY&profile::boilerplate-staging
-AWS_CONFIG_PRODUCTION=access_key_id::ACCESS_KEY_ID&secret_access_key::SECRET_ACCESS_KEY&profile::boilerplate-production
+AWS_CONFIG_DEV=accessKeyId::ACCESS_KEY_ID&secretAccessKey::SECRET_ACCESS_KEY&profile::neverstop-development&apiVersion::API_VERSION
+AWS_CONFIG_STAGING=accessKeyId::ACCESS_KEY_ID&secretAccessKey::SECRET_ACCESS_KEY&profile::neverstop-staging&apiVersion::API_VERSION
+AWS_CONFIG_PRODUCTION=accessKeyId::ACCESS_KEY_ID&secretAccessKey::SECRET_ACCESS_KEY&profile::neverstop-production&apiVersion::API_VERSION
+
+AWS_BUCKET_DEV=region::AWS_BUCKET_REGION&bucket::BUCKET_NAME_DEV
+AWS_BUCKET_STAGING=region::AWS_BUCKET_REGION&bucket::BUCKET_NAME_STAGING
+AWS_BUCKET_PRODUCTION=region::AWS_BUCKET_REGION&bucket::BUCKET_NAME_PRODUCTION
+
+AWS_BUCKET_PATH=avatar::avatar_files&sound::sound_files&assets::asset_files
 
 ## License
 
