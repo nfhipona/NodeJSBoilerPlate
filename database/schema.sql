@@ -127,9 +127,9 @@ CREATE TABLE `account` (
     `prefix` varchar(25) COMMENT 'Mr/Ms, Dr' COMMENT 'Optional name field',
     `suffix` varchar(25) COMMENT 'Sr/Jr, PhD, IV' COMMENT 'Optional name field',
 
-    `first_name` varchar(100) NOT NULL,
+    `first_name` varchar(100),
     `middle_name` varchar(100) COMMENT 'Optional name field',
-    `last_name` varchar(100) NOT NULL,
+    `last_name` varchar(100),
     `avatar` varchar(255) COMMENT 'avatar`s filename',
 
     `title` varchar(100),
