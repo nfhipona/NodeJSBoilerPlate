@@ -62,7 +62,7 @@ INSERT INTO `permission` (`role_id`, `resource_id`, `mode`, `is_disabled`) VALUE
 (@sysID, @maintenance, 'd', 0),
 (@sysID, @media_resource, 'r', 0), -- media_resource
 (@sysID, @media_resource, 'w', 0),
-(@sysID, @media_resource, 'd', 1),
+(@sysID, @media_resource, 'd', 0),
 (@sysID, @user_management, 'r', 0), -- user_management
 (@sysID, @user_management, 'w', 0),
 (@sysID, @user_management, 'd', 0),
@@ -74,9 +74,9 @@ INSERT INTO `permission` (`role_id`, `resource_id`, `mode`, `is_disabled`) VALUE
 (@stdID, @maintenance, 'r', 0), -- maintenance
 (@stdID, @maintenance, 'w', 1),
 (@stdID, @maintenance, 'd', 1),
-(@stdID, @media_resource, 'r', 1), -- media_resource
-(@stdID, @media_resource, 'w', 1),
-(@stdID, @media_resource, 'd', 1),
+(@stdID, @media_resource, 'r', 0), -- media_resource
+(@stdID, @media_resource, 'w', 0),
+(@stdID, @media_resource, 'd', 0),
 (@stdID, @user_management, 'r', 1), -- user_management
 (@stdID, @user_management, 'w', 1),
 (@stdID, @user_management, 'd', 1),
