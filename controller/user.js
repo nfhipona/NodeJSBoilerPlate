@@ -539,75 +539,23 @@ module.exports = (database, auth) => {
             };
             
             helper.validateBody(form, data, res, () => {
-                database.transaction((err, conn) => {
+                database.connection((err, conn) => {
                     if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
 
-                    _account_exist(conn, data, form);
+                    _bind_account(conn, data, form);
                 });
-            });
-        }
-
-        function _account_exist(conn, data, form) {
-            const query = `SELECT * FROM account a
-                WHERE a.user_id = ${database.uuidToBIN}`;
-
-            conn.query(query, [data.user_id], (err, rows) => {
-                if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_ACCOUNT_CREATE_FAILED));
-                rows.length > 0 ? _update_account(conn, data, form) : _bind_account(conn, data, form);
-            });
-        }
-
-        function _update_account(conn, data, form) {
-            const set_query = database.format(form, data);
-            const query = `UPDATE account SET ${set_query} \
-                WHERE user_id = ${database.uuidToBIN}`;
-
-            conn.query(query, [data.user_id], (err, rows) => {
-                if (err || rows.affectedRows === 0) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_ACCOUNT_CREATE_FAILED));
-
-                _get_user(conn, data);
             });
         }
 
         function _bind_account(conn, data, form) {
             const set_query = database.format(form, data);
-            const query = `INSERT INTO account SET ${set_query}`;
+            const query = `INSERT INTO account \
+                SET ${set_query}`;
 
             conn.query(query, (err, rows) => {
-                if (err || rows.affectedRows === 0) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_ACCOUNT_CREATE_FAILED));
+                if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.USER_ACCOUNT_CREATE_FAILED);
 
-                _get_user(conn, data);
-            });
-        }
-
-        function _get_user(conn, data) {
-            const fields = [
-                'u.*',
-                'u.id AS user_id',
-                database.binToUUID('u.id', 'id'),
-                database.binToUUID('r.id', 'role_id'),
-                'r.code AS role_code',
-                'r.name AS role_name',
-                'r.description AS role_description'
-            ].join(', ');
-
-            const where = [
-                `u.id = ${database.uuidToBIN}`,
-                'u.activated = 1',
-                'u.deleted <> 1'
-            ].join(' AND ');
-
-            const query = `SELECT ${fields} FROM user u \
-                INNER JOIN role r ON r.id = u.role_id \
-                WHERE ${where}`;
-
-            conn.query(query, [data.user_id], (err, rows) => {
-                if (err || rows.length === 0) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_ACCOUNT_CREATE_FAILED));
-                
-                const record = rows[0];
-                delete record.password;
-                
-                _get_user_account(conn, record);
+                _get_user_account(conn, data);
             });
         }
 
@@ -618,23 +566,78 @@ module.exports = (database, auth) => {
             ].join(', ');
 
             const query = `SELECT ${fields} FROM account a
-                WHERE a.user_id = ?`;
+                WHERE a.user_id = ${database.uuidToBIN}`;
 
             conn.query(query, [record.user_id], (err, rows) => {
-                if (err || rows.length === 0) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_ACCOUNT_CREATE_FAILED));
-                
-                delete record.user_id; // remove binary id -- used only in query
-                const account = (rows && rows.length > 0) ? rows[0] : null;
-                const user_data = { user: record, account: account };
+                if (err || rows.length === 0) return helper.send400(conn, res, err, c.USER_ACCOUNT_CREATE_FAILED);
 
-                _send_response(conn, user_data);
+                helper.send200(conn, res, rows[0], c.USER_ACCOUNT_CREATE_SUCCESS);
             });
         }
 
-        function _send_response(conn, user_data) {
-            database.commit(conn, err => {
-                if (err) return helper.send400(null, res, err, c.USER_ACCOUNT_CREATE_FAILED);
-                helper.send200(null, res, user_data, c.USER_ACCOUNT_CREATE_SUCCESS);
+        _proceed();
+    }
+
+    function update_account(req, res) {
+        const decoded = req.get('decoded_token');
+
+        function _proceed() {
+            const data = req.body;
+            
+            const form = {
+                _prefix: '',
+                _suffix: '',
+
+                _first_name: '',
+                _middle_name: '',
+                _last_name: '',
+                _gender: '',
+                _birthdate: '', // YYYY-MM-DD
+
+                _title: '',
+                _position: '',
+                _location: '',
+
+                _mobile: '',
+                _website: ''
+            };
+            
+            helper.validateBody(form, data, res, () => {
+                database.connection((err, conn) => {
+                    if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
+
+                    _update_account(conn, data, form);
+                });
+            });
+        }
+
+        function _update_account(conn, data, form) {
+            const set_query = database.format(form, data);
+            const query = `UPDATE account \
+                SET ${set_query} \
+                WHERE user_id = ${database.uuidToBIN}`;
+
+            conn.query(query, [decoded.id], (err, rows) => {
+                if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.USER_ACCOUNT_UPDATE_FAILED);
+
+                _get_user_account(conn);
+            });
+        }
+
+        function _get_user_account(conn) {
+            const fields = [
+                'a.*',
+                database.binToUUID('a.user_id', 'user_id')
+            ].join(', ');
+
+            const query = `SELECT ${fields} \
+                FROM account a
+                WHERE a.user_id = ${database.uuidToBIN}`;
+
+            conn.query(query, [decoded.id], (err, rows) => {
+                if (err || rows.length === 0) return helper.send400(conn, res, err, c.USER_ACCOUNT_UPDATE_FAILED);
+
+                helper.send200(conn, res, rows[0], c.USER_ACCOUNT_UPDATE_SUCCESS);
             });
         }
 
@@ -648,7 +651,8 @@ module.exports = (database, auth) => {
         change_pw,
         forgot_pw,
         confirm_pw,
-        create_account
+        create_account,
+        update_account
     }
 }
 

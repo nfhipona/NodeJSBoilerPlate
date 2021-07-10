@@ -83,6 +83,8 @@ exports.USER_FORGOT_PW_SUCCESS      = 'User password reset request';
 exports.USER_FORGOT_PW_FAILED       = 'User password reset request failed';
 exports.USER_ACCOUNT_CREATE_SUCCESS = 'User account created';
 exports.USER_ACCOUNT_CREATE_FAILED  = 'User account create failed';
+exports.USER_ACCOUNT_UPDATE_SUCCESS = 'User account updated';
+exports.USER_ACCOUNT_UPDATE_FAILED  = 'User account update failed';
 
 exports.UPLOAD_SUCCESS              = 'Upload success'
 exports.UPLOAD_FAILED               = 'Upload failed'
