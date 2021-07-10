@@ -26,7 +26,7 @@ module.exports = (database, auth) => {
                 const name = `avatar-${decoded.id}`;
                 const extension = multer.fileExtension(file.originalname);
                 const filename = multer.fileName(name, extension);
-                file.filename = filename;
+                file.filename_aws = filename;
 
                 aws.s3Upload(filename, file.path, (err, data) => {
                     if (err) return helper.send400(null, res, err, c.UPLOAD_FAILED);
@@ -66,7 +66,7 @@ module.exports = (database, auth) => {
                 SET ${fields} \
                 WHERE user_id = ${database.uuidToBIN}`;
                 
-            conn.query(query, [file.filename, file.fileurl, decoded.id], (err, rows) => {
+            conn.query(query, [file.filename_aws, file.fileurl, decoded.id], (err, rows) => {
                 if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.UPLOAD_FAILED);
 
                 _success_response(conn, file);
@@ -83,7 +83,7 @@ module.exports = (database, auth) => {
             const query = `INSERT INTO account \
                 SET ${fields}`;
 
-            conn.query(query, [decoded.id, file.filename, file.fileurl], (err, rows) => {
+            conn.query(query, [decoded.id, file.filename_aws, file.fileurl], (err, rows) => {
                 if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.UPLOAD_FAILED);
 
                 _success_response(conn, file);
@@ -91,7 +91,7 @@ module.exports = (database, auth) => {
         }
 
         function _success_response(conn, file) {
-            const response_message = { message: 'File has been uploaded', filename: file.filename };
+            const response_message = { message: 'File has been uploaded', filename: file.filename_aws };
             helper.send200(conn, res, response_message, c.UPLOAD_SUCCESS);
         }
 
