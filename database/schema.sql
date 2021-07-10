@@ -131,6 +131,7 @@ CREATE TABLE `account` (
     `middle_name` varchar(100) COMMENT 'Optional name field',
     `last_name` varchar(100),
     `avatar` varchar(255) COMMENT 'avatar`s filename',
+    `avatar_url` varchar(255) COMMENT 'avatar`s file url',
 
     `title` varchar(100),
     `position` varchar(100),
