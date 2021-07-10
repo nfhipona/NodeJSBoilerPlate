@@ -86,5 +86,5 @@ exports.USER_ACCOUNT_CREATE_FAILED  = 'User account create failed';
 exports.USER_ACCOUNT_UPDATE_SUCCESS = 'User account updated';
 exports.USER_ACCOUNT_UPDATE_FAILED  = 'User account update failed';
 
-exports.UPLOAD_SUCCESS              = 'Upload success'
-exports.UPLOAD_FAILED               = 'Upload failed'
+exports.UPLOAD_SUCCESS              = 'Upload success';
+exports.UPLOAD_FAILED               = 'Upload failed';
