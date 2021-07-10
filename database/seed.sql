@@ -43,15 +43,15 @@ INSERT INTO `permission` (`role_id`, `resource_id`, `mode`, `is_disabled`) VALUE
 (@supID, @maintenance, 'r', 0), -- maintenance
 (@supID, @maintenance, 'w', 0),
 (@supID, @maintenance, 'd', 0),
-(@supID, @media_resource, 'r', 0), -- media_resource
-(@supID, @media_resource, 'w', 0),
-(@supID, @media_resource, 'd', 0),
 (@supID, @user_management, 'r', 0), -- user_management
 (@supID, @user_management, 'w', 0),
 (@supID, @user_management, 'd', 0),
 (@supID, @user_account, 'r', 0), -- user_account
 (@supID, @user_account, 'w', 0),
 (@supID, @user_account, 'd', 0),
+(@supID, @media_resource, 'r', 0), -- media_resource
+(@supID, @media_resource, 'w', 0),
+(@supID, @media_resource, 'd', 0),
 
 -- sys_admin
 (@sysID, @resource, 'r', 0), -- resource
@@ -60,29 +60,29 @@ INSERT INTO `permission` (`role_id`, `resource_id`, `mode`, `is_disabled`) VALUE
 (@sysID, @maintenance, 'r', 0), -- maintenance
 (@sysID, @maintenance, 'w', 0),
 (@sysID, @maintenance, 'd', 0),
-(@sysID, @media_resource, 'r', 0), -- media_resource
-(@sysID, @media_resource, 'w', 0),
-(@sysID, @media_resource, 'd', 0),
 (@sysID, @user_management, 'r', 0), -- user_management
 (@sysID, @user_management, 'w', 0),
 (@sysID, @user_management, 'd', 0),
 (@sysID, @user_account, 'r', 0), -- user_account
 (@sysID, @user_account, 'w', 0),
 (@sysID, @user_account, 'd', 0),
+(@sysID, @media_resource, 'r', 0), -- media_resource
+(@sysID, @media_resource, 'w', 0),
+(@sysID, @media_resource, 'd', 0),
 
 -- std_user
 (@stdID, @maintenance, 'r', 0), -- maintenance
 (@stdID, @maintenance, 'w', 1),
 (@stdID, @maintenance, 'd', 1),
-(@stdID, @media_resource, 'r', 0), -- media_resource
-(@stdID, @media_resource, 'w', 0),
-(@stdID, @media_resource, 'd', 0),
 (@stdID, @user_management, 'r', 1), -- user_management
 (@stdID, @user_management, 'w', 1),
 (@stdID, @user_management, 'd', 1),
 (@stdID, @user_account, 'r', 0), -- user_account
 (@stdID, @user_account, 'w', 0),
-(@stdID, @user_account, 'd', 0);
+(@stdID, @user_account, 'd', 0),
+(@stdID, @media_resource, 'r', 0), -- media_resource
+(@stdID, @media_resource, 'w', 0),
+(@stdID, @media_resource, 'd', 0);
 
 --
 -- Data for table `user`
