@@ -110,6 +110,8 @@ exports.checkError = (err, errCode = 400) => {
             return { code: 500, error: 'Internal server error.' };
         } else if (code === 'LIMIT_UNEXPECTED_FILE') {
             return { code: 400, error: 'Invalid file key.' };
+        } else if (code === 'UnknownEndpoint') { // Inaccessible host: `s3.aws_bucket_region.amazonaws.com'
+            return { code: 500, error: 'Internal server error.' };
         }
     }
 
