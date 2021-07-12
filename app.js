@@ -47,7 +47,7 @@ function prepareApp() {
         const welcomeMsg = {
             version: pjson.version,
             message: `Welcome to ${pjson.app_name} API`,
-            docs: 'https://documenter.getpostman.com/view/3554620/TzY6Ausw'
+            docs: pjson.api_docs
         };
         helper.send(200)(null, res, welcomeMsg, c.SERVER_WELCOME);
     });

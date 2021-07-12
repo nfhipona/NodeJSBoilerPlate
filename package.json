@@ -1,6 +1,7 @@
 {
   "name": "boilerplate-nodejs",
   "app_name": "Boilerplate NodeJS",
+  "api_docs": "https://documenter.getpostman.com/view/3554620/TzY6Ausw",
   "version": "0.0.1",
   "description": "Template for NodeJS/ExpressJs projects for backend development",
   "main": "index.js",
