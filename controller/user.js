@@ -504,7 +504,7 @@ module.exports = (database, auth) => {
             }else{
                 // :- Send only
                 transporter.sendOnly(options);
-                helper.send200(conn, res, null, c.USER_CHANGE_PW_SUCCESS);
+                helper.send204(conn, res, null, c.USER_CHANGE_PW_SUCCESS);
             }
         }
 
