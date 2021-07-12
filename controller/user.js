@@ -326,7 +326,7 @@ module.exports = (database, auth) => {
                 conn.query(query, [hash, record.user_id], (err, rows) => {
                     if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
                     
-                    helper.send200(conn, res, null, c.USER_CHANGE_PW_SUCCESS);
+                    helper.send204(conn, res, null, c.USER_CHANGE_PW_SUCCESS);
                 });
             });
         }
