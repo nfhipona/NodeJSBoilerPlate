@@ -29,6 +29,10 @@ exports.send200 = (conn, res, data, context) => {
     this.send(200)(conn, res, data, context);
 }
 
+exports.send204 = (conn, res, data, context) => {
+    this.send(204)(conn, res, data, context);
+}
+
 exports.send400 = (conn, res, err, context) => {
     const error_data = this.checkError(err);
     this.send(400, false)(conn, res, error_data, context);
