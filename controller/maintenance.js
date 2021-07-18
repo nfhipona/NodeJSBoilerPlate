@@ -45,7 +45,7 @@ module.exports = (database) => {
 
             conn.query(query, [1, data.is_down], (err, rows) => {
                 const response_message = helper.errMsgData(400, 'Could not set while another maintenance window is active.');
-                if (err || rows.length > 0) return database.rollback(conn, () => helper.send400(null, res, err || response_message, c.MAINTENANCE_SET_FAILED));
+                if (err || rows.length > 0) return helper.sendRollback(database, conn, res, err || response_message, c.MAINTENANCE_SET_FAILED);
 
                 _set_maintenance(conn, data); // proceed normally
             });
@@ -59,7 +59,7 @@ module.exports = (database) => {
                 ON DUPLICATE KEY UPDATE ?`;
 
             conn.query(query, [data_cp, data_cp], (err, rows) => {
-                if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED));
+                if (err) return helper.sendRollback(database, conn, res, err, c.MAINTENANCE_SET_FAILED);
 
                 _create_history(conn, data);
             });
@@ -83,7 +83,7 @@ module.exports = (database) => {
                 SET ${set_query}`;
 
             conn.query(query, (err, rows) => {
-                if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED));
+                if (err) return helper.sendRollback(database, conn, res, err, c.MAINTENANCE_SET_FAILED);
 
                 _load_info(conn, 1);
             });
@@ -94,18 +94,14 @@ module.exports = (database) => {
                 WHERE id = ?`;
 
             conn.query(query, [infoId], (err, rows) => {
-                if (err || rows.length === 0) return database.rollback(conn, () => helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED));
-
+                if (err || rows.length === 0) return helper.sendRollback(database, conn, res, err, c.MAINTENANCE_SET_FAILED);
+                
                 _success_response(conn, rows[0]);
             });
         }
 
         function _success_response(conn, data) {
-            database.commit(conn, err => {
-                if (err) return helper.send400(null, res, err, c.MAINTENANCE_SET_FAILED);
-
-                helper.send200(null, res, data, c.MAINTENANCE_SET_SUCCESS);
-            });
+            helper.sendCommit(database, conn, res, data, c.MAINTENANCE_SET_FAILED, c.MAINTENANCE_SET_SUCCESS);
         }
 
         _proceed();
