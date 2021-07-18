@@ -25,8 +25,11 @@ module.exports = (database, auth) => {
                 const file = req.file;
                 const name = `avatar-${decoded.id}`;
                 const extension = multer.fileExtension(file.originalname);
+                const aws_folder = `${decoded.id}/images`;
                 const filename = multer.fileName(name, extension);
+                const aws_filepath = `${aws_folder}/${filename}`;
                 file.filename_aws = filename;
+                file.filepath_aws = aws_filepath;
 
                 aws.s3Upload(filename, file.path, (err, data) => {
                     if (err) return helper.send400(null, res, err, c.UPLOAD_FAILED);
