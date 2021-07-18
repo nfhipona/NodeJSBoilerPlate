@@ -373,7 +373,7 @@ module.exports = (database) => {
 
             _remove_permission(conn, _forRemove, modes => {
                 async.map(_forAdd, __add_permission, (err, ms) => {
-                    if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.PERMISSION_UPDATE_FAILED));
+                    if (err) return helper.sendRollback(database, conn, res, err, c.PERMISSION_UPDATE_FAILED);
 
                     _load_resource(conn);
                 });
@@ -417,7 +417,7 @@ module.exports = (database) => {
                 WHERE ${where}`;
 
             conn.query(query, [roleId, resourceId, modes], (err, rows) => {
-                if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.PERMISSION_UPDATE_FAILED));
+                if (err) return helper.sendRollback(database, conn, res, err, c.PERMISSION_UPDATE_FAILED);
 
                 return next(modes || []);
             });
@@ -433,7 +433,7 @@ module.exports = (database) => {
                 WHERE r.id = ${database.uuidToBIN}`;
 
             conn.query(query, [resourceId], (err, rows) => {
-                if (err || rows.length === 0) return database.rollback(conn, () => helper.send400(null, res, err, c.PERMISSION_UPDATE_FAILED));
+                if (err || rows.length === 0) return helper.sendRollback(database, conn, res, err, c.PERMISSION_UPDATE_FAILED);
 
                 _load_permission(conn, roleId, rows[0]);
             });
@@ -464,18 +464,14 @@ module.exports = (database) => {
                 WHERE ${where}`;
 
             conn.query(query, [resourceId, roleId], (err, rows) => {
-                if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.PERMISSION_UPDATE_FAILED));
+                if (err) return helper.sendRollback(database, conn, res, err, c.PERMISSION_UPDATE_FAILED);
 
                 _success_response(conn, { resource, permissions: rows });
             });
         }
 
         function _success_response(conn, data) {
-            database.commit(conn, err => {
-                if (err) return helper.send400(null, res, err, c.PERMISSION_UPDATE_FAILED);
-
-                helper.send200(null, res, data, c.PERMISSION_UPDATE_SUCCESS);
-            });
+            helper.sendCommit(database, conn, res, data, c.PERMISSION_UPDATE_FAILED, c.PERMISSION_UPDATE_SUCCESS);
         }
 
         _proceed();
