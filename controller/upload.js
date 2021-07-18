@@ -30,7 +30,8 @@ module.exports = (database, auth) => {
                 const aws_filepath = `${aws_folder}/${filename}`;
                 file.filename_aws = filename;
                 file.filepath_aws = aws_filepath;
-
+                helper.log(file, 'MEDIA LOG');
+                
                 aws.s3Upload(filename, file.path, (err, data) => {
                     if (err) return helper.send400(null, res, err, c.UPLOAD_FAILED);
 
