@@ -75,8 +75,20 @@ exports.sendResponse = (res, code, data) => {
         .end();
 }
 
-/** ERROR HANDLER */
+/** DATABASE HANDLER */
+exports.sendRollback = (database, conn, res, err, context) => {
+    database.rollback(conn, () => this.send400(null, res, err, context));
+}
 
+exports.sendCommit = (database, conn, res, data, err_context, succ_context) => {
+    database.commit(conn, err => {
+        if (err) return this.send400(null, res, err, err_context);
+
+        this.send200(null, res, data, succ_context);
+    });
+}
+
+/** ERROR HANDLER */
 exports.checkError = (err, errCode = 400) => {
     this.log(err, 'ERROR');
 
