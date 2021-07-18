@@ -138,14 +138,14 @@ module.exports = (database, auth) => {
 
         function _create_user(conn, data, form) {
             exports._encrypt_password(data.password, (err, hash) => {
-                if (err) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_CREATE_FAILED));
+                if (err) return helper.sendRollback(database, conn, res, err, c.USER_CREATE_FAILED);
                 data.password = hash; // set hashed password
 
                 const set_query = database.format(form, data);
                 const query = `INSERT INTO user SET ${set_query}`;
 
                 conn.query(query, (err, rows) => {
-                    if (err || rows.affectedRows === 0) return database.rollback(conn, () => helper.send400(null, res, err, c.USER_CREATE_FAILED));
+                    if (err || rows.affectedRows === 0) return helper.sendRollback(database, conn, res, err, c.USER_CREATE_FAILED);
 
                     _prepare_mail(conn, data);
                 });
@@ -174,21 +174,15 @@ module.exports = (database, auth) => {
             if (isDev) {
                 transporter.sendMail(options, (success, res_data) => {
                     if (success) {
-                        database.commit(conn, err => {
-                            if (err) return helper.send400(null, res, err, c.USER_CREATE_FAILED);
-                            helper.send200(null, res, options, c.USER_CREATE_SUCCESS);
-                        });                    
+                        helper.sendCommit(database, conn, res, options, c.USER_CREATE_FAILED, c.USER_CREATE_SUCCESS);
                     }else{
-                        database.rollback(conn, () => helper.send400(null, res, res_data.error, c.USER_CREATE_FAILED));
+                        helper.sendRollback(database, conn, res, res_data.error, c.USER_CREATE_FAILED);
                     }
                 });
             }else{
                 // :- Send only
                 transporter.sendOnly(options);
-                database.commit(conn, err => {
-                    if (err) return helper.send400(null, res, err, c.USER_CREATE_FAILED);
-                    helper.send200(null, res, null, c.USER_CREATE_SUCCESS);
-                });
+                helper.sendCommit(database, conn, res, null, c.USER_CREATE_FAILED, c.USER_CREATE_SUCCESS);
             }
         }
 
