@@ -91,7 +91,7 @@ module.exports = (database) => {
                     WHERE id = ${database.uuidToBIN}`;
 
                 conn.query(query, [uuID], (err, rows) => {
-                    if (err || rows.affectedRows == 0) return helper.send400(conn, res, err, c.ROLE_UPDATE_FAILED);
+                    if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.ROLE_UPDATE_FAILED);
 
                     _load_role(conn);
                 });
