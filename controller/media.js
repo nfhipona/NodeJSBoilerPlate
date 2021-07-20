@@ -13,7 +13,7 @@ const aws           = awsJS.initAWS(); // use default env.config
 
 module.exports = (database, auth) => {
 
-    function avatar_upload(req, res) {
+    function upload_avatar(req, res) {
         const decoded = req.get('decoded_token');
         
         function _upload() {
@@ -103,6 +103,6 @@ module.exports = (database, auth) => {
     }
 
     return {
-        avatar_upload
+        upload_avatar
     }
 }
