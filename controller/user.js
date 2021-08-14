@@ -64,7 +64,7 @@ module.exports = (database, auth) => {
                 ].join(' AND ');
 
                 const query = `SELECT ${fields} FROM user u \
-                    INNER JOIN role r ON r.id = u.role_id \
+                    LEFT JOIN role r ON r.id = u.role_id \
                     WHERE ${where}`;
 
                 conn.query(query, [data.username, data.username], (err, rows) => {
@@ -121,7 +121,7 @@ module.exports = (database, auth) => {
 
             const form = {
                 id: 'uuid',
-                role_id: 'uuid',
+                _role_id: 'uuid',
                 email: '',
                 _username: '',
                 password: ''
