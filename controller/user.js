@@ -196,6 +196,108 @@ module.exports = (database, auth) => {
         _proceed();
     }
 
+    function signup_n_login(req, res) {
+        function _proceed() {
+            const data = req.body;
+            data.id = uuid();
+
+            const form = {
+                id: 'uuid',
+                _role_id: 'uuid',
+                email: '',
+                _username: '',
+                password: ''
+            };
+
+            helper.validateBody(form, data, res, () => {
+                database.transaction((err, conn) => {
+                    if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
+
+                    _create_user(conn, data, form);
+                });
+            });
+        }
+
+        function _create_user(conn, data, form) {
+            exports._encrypt_password(data.password, (err, hash) => {
+                if (err) return helper.sendRollback(database, conn, res, err, c.USER_CREATE_FAILED);
+                data.password = hash; // set hashed password
+
+                const set_query = database.format(form, data);
+                const query = `INSERT INTO user SET ${set_query}`;
+
+                conn.query(query, (err, rows) => {
+                    if (err || rows.affectedRows === 0) return helper.sendRollback(database, conn, res, err, c.USER_CREATE_FAILED);
+
+                    _get_user(conn, data)
+                });
+            });
+        }
+
+        function _get_user(conn, data) {
+            const fields = [
+                'u.*',
+                database.binToUUID('u.id', 'id'),
+                database.binToUUID('r.id', 'role_id'),
+                'r.code AS role_code',
+                'r.name AS role_name',
+                'r.description AS role_description'
+            ].join(', ');
+
+            const query = `SELECT ${fields} FROM user u \
+                LEFT JOIN role r ON r.id = u.role_id \
+                WHERE u.id = ${database.uuidToBIN}`;
+
+            conn.query(query, [data.id], (err, rows) => {
+                if (err || rows.length === 0) return helper.send400(conn, res, err, c.USER_SIGNIN_FAILED);
+
+                _create_user_object(conn, rows[0]);
+            });
+        }
+
+        function _create_user_object(conn, record) {
+            delete record.password; // remove password info
+            const user_data = { user: record, account: null };
+
+            const token = auth.createPayloadToken(record, c.USER_TOKEN);
+            user_data.token_data = token;
+
+            _prepare_mail(conn, record, user_data); // create registration token for validation -- emailed
+        }
+
+        function _prepare_mail(conn, data, user_data) {
+            const email = data.email;
+            const type = c.REGISTRATION_TOKEN;
+
+            const payload = {
+                type,
+                email: email,
+                id: data.id,
+                role_id: data.role_id
+            };
+
+            const token_options = { type, expiresIn: c.TOKEN_MIN_EXPIRY };
+            const token = auth.createToken(payload, token_options).token;
+            const email_validation_link = _create_email_validation_link(data, token);
+            const from = mailOptionsSignUp.from;
+            const subject = mailOptionsSignUp.subject;
+            const html = mailOptionsSignUp.html(email, email_validation_link);
+            const options = exports._create_mail_options(from, email, subject, html);
+
+            transporter.sendOnly(options);
+            helper.sendCommit(database, conn, res, user_data, c.USER_CREATE_FAILED, c.USER_CREATE_SUCCESS);
+        }
+
+        function _create_email_validation_link(data, token) {
+            const obj = { email: data.email, role_id: data.role_id };
+            const base64encode = util.encodeObj(obj);
+            const url = `${api_host}${api_user_confirm_registration}${base64encode}?token=${token}`;
+            return url;
+        }
+
+        _proceed();
+    }
+
     function confirm(req, res) {
         const decoded = req.get('decoded_token');
 
@@ -641,6 +743,7 @@ module.exports = (database, auth) => {
     return {
         signin,
         signup,
+        signup_n_login,
         confirm,
         change_pw,
         forgot_pw,
