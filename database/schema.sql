@@ -102,7 +102,7 @@ CREATE TABLE `maintenance_history` (
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
     `id` binary(16) NOT NULL,
-    `role_id` binary(16) NOT NULL,
+    `role_id` binary(16),
 
     `email` varchar(100) NOT NULL,
     `password` varchar(255) NOT NULL,
