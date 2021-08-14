@@ -34,7 +34,7 @@ function prepareApp() {
     const v1api       = express();
     router(v1api, database, auth);
     resource(v1api, database, auth);
-    app.use('/api/v1/', v1api);
+    app.use('/v1/', v1api);
 
     // :-- configure api
 
