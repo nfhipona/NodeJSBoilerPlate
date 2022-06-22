@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@socket.io/redis-adapter": "^7.0.0",
-    "async": "^3.2.0",
+    "async": "^3.2.2",
     "aws-sdk": "^2.943.0",
     "bcrypt": "^5.0.1",
     "cluster": "^0.7.7",
