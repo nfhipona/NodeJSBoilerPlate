@@ -70,7 +70,7 @@ CREATE TABLE `maintenance` (
 
     `title` varchar(255) NOT NULL,
     `description` varchar(255) DEFAULT '',
-    `message` text DEFAULT '',
+    `message` text,
     `is_down` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 - SERVER_DOWN | 0 - SERVER_UP',
 
     `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -88,7 +88,7 @@ CREATE TABLE `maintenance_history` (
 
     `title` varchar(255) NOT NULL,
     `description` varchar(255) DEFAULT '',
-    `message` text DEFAULT '',
+    `message` text,
     `status` varchar(20) NOT NULL DEFAULT 0 COMMENT '1 - SERVER_DOWN | 0 - SERVER_UP',
 
     `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -106,6 +106,7 @@ CREATE TABLE `user` (
 
     `email` varchar(100) NOT NULL,
     `password` varchar(255) NOT NULL,
+    `ivHex` varchar(255) NOT NULL COMMENT 'Initialization vector iv key',
     `activated` tinyint(1) NOT NULL DEFAULT 0,
 
     `deleted` tinyint(1) NOT NULL DEFAULT 0,

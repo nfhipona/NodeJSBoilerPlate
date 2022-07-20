@@ -5,12 +5,11 @@ const c             = require(__dirname + '/../config/constant.js');
 const config        = require(__dirname + '/../config/config.js');
 const util          = require(__dirname + '/../lib/util.js');
 const transporter   = require(__dirname + '/../lib/transporter.js');
+const cryptor       = require(__dirname + '/../lib/cryptor.js');
 
 const uuid          = require('uuid').v1;
-const bcrypt        = require('bcrypt');
 
 const isDev                         = config.isDev();
-const bcryptConf                    = config.bcryptConfig;
 const mailOptionsSignUp             = config.mailOptionsSignUp;
 const mailOptionsUserInvite         = config.mailOptionsUserInvite;
 const mailOptionsPWDReset           = config.mailOptionsPWDReset;
@@ -76,13 +75,12 @@ module.exports = (database, auth) => {
         }
 
         function _validate_password(conn, data, record) {
-            bcrypt.compare(data.password, record.password, (err, result) => {
-                if (result) {
-                    delete record.password;
-                    _get_user_account(conn, record);
-                }else{
-                    helper.send400(conn, res, err, c.USER_SIGNIN_FAILED);
-                }
+            cryptor.decrypt(record.password, (err, decrypted) => {
+                helper.log(`pwd: ${data.password} == decrypted: ${decrypted}`);
+                if (err || data.password !== decrypted) return helper.send400(conn, res, err, c.USER_SIGNIN_FAILED);
+
+                delete record.password;
+                _get_user_account(conn, record);
             });
         }
 
@@ -126,7 +124,7 @@ module.exports = (database, auth) => {
                 _username: '',
                 password: ''
             };
-
+            helper.log(form, 'parameter')
             helper.validateBody(form, data, res, () => {
                 database.transaction((err, conn) => {
                     if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
@@ -137,16 +135,17 @@ module.exports = (database, auth) => {
         }
 
         function _create_user(conn, data, form) {
-            exports._encrypt_password(data.password, (err, hash) => {
+            cryptor.encrypt(data.password, (err, { ivHex, encrypted }) => {
                 if (err) return helper.sendRollback(database, conn, res, err, c.USER_CREATE_FAILED);
-                data.password = hash; // set hashed password
-
+                data.password = encrypted; // set encrypted password
+                data.ivHex = ivHex;
+    
                 const set_query = database.format(form, data);
                 const query = `INSERT INTO user SET ${set_query}`;
-
+    
                 conn.query(query, (err, rows) => {
                     if (err || rows.affectedRows === 0) return helper.sendRollback(database, conn, res, err, c.USER_CREATE_FAILED);
-
+    
                     _prepare_mail(conn, data);
                 });
             });
@@ -219,9 +218,10 @@ module.exports = (database, auth) => {
         }
 
         function _create_user(conn, data, form) {
-            exports._encrypt_password(data.password, (err, hash) => {
+            cryptor.encrypt(data.password, (err, { ivHex, encrypted }) => {
                 if (err) return helper.sendRollback(database, conn, res, err, c.USER_CREATE_FAILED);
-                data.password = hash; // set hashed password
+                data.password = encrypted; // set encrypted password
+                data.ivHex = ivHex;
 
                 const set_query = database.format(form, data);
                 const query = `INSERT INTO user SET ${set_query}`;
@@ -414,12 +414,14 @@ module.exports = (database, auth) => {
         }
 
         function _change_password(conn, data, record) {
-            exports._encrypt_password(data.password, (err, hash) => {
+            cryptor.encrypt(data.password, (err, { ivHex, encrypted }) => {
+                if (err) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
+                
                 const query = `UPDATE user u \
-                    SET u.password = ? \
+                    SET u.password = ? AND u.ivHex = ? \
                     WHERE u.id = ?`;
 
-                conn.query(query, [hash, record.user_id], (err, rows) => {
+                conn.query(query, [encrypted, ivHex, record.user_id], (err, rows) => {
                     if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
                     
                     helper.send204(conn, res, null, c.USER_CHANGE_PW_SUCCESS);
@@ -568,12 +570,14 @@ module.exports = (database, auth) => {
         }
 
         function _change_password(conn, data, record) {
-            exports._encrypt_password(data.password, (err, hash) => {
+            cryptor.encrypt(data.password, (err, { ivHex, encrypted }) => {
+                if (err) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
+
                 const query = `UPDATE user u \
-                    SET u.password = ? \
+                    SET u.password = ? AND u.ivHex = ? \
                     WHERE u.id = ${database.uuidToBIN}`;
 
-                conn.query(query, [hash, decoded.id], (err, rows) => {
+                conn.query(query, [encrypted, ivHex, decoded.id], (err, rows) => {
                     if (err || rows.affectedRows === 0) return helper.send400(conn, res, err, c.USER_CHANGE_PW_FAILED);
                     
                     auth.removeToken(decoded); // remove reset password token | prevent reuse
@@ -764,15 +768,4 @@ exports._create_mail_options = (from, to, subject, html) => {
         from, to, subject, html
     };
     return mail_options;
-}
-
-exports._encrypt_password = (password, next) => {
-    bcrypt.genSalt(bcryptConf.rounds, (err, salt) => {
-        if (err) { return next(err, null); }
-
-        bcrypt.hash(password, salt, (err, hash) => {
-            if (err) { return next(err, null); }
-            next(null, hash);
-        });
-    });
 }

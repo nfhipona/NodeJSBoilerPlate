@@ -4,6 +4,7 @@
 const expect            =   require('chai').expect;
 const request           =   require('supertest');
 const config            =   require(__dirname + '/../config/config.js');
+const helper            =   require(__dirname + '/../helper/helper.js');
 
 const envConfig         =   config.envConfig;
 
@@ -15,5 +16,5 @@ const api               = request(endpoint); // modular
 const headers           =   { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 const t                 =   token => { return { 'x-access-token': token } };
 
-console.log(`\nTest Server Endpoint: ${endpoint}`);
+helper.log(`\nTest Server Endpoint: ${endpoint}`);
 module.exports = { api, expect, headers, t };
