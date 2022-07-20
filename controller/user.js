@@ -82,6 +82,7 @@ module.exports = (database, auth) => {
                 if (err || data.password !== decrypted) return helper.send400(conn, res, err, c.USER_SIGNIN_FAILED);
 
                 delete record.password;
+                delete record.ivHex;
                 _get_user_account(conn, record);
             });
         }
@@ -104,10 +105,7 @@ module.exports = (database, auth) => {
 
                 const token = auth.createPayloadToken(record, c.USER_TOKEN);
                 user_data.token_data = token;
-
-                req.user_data = user_data;
-
-                return next(); // proceed to login check
+                helper.send200(conn, res, user_data, c.USER_LOGIN_SUCCESS);
             });
         }
 
