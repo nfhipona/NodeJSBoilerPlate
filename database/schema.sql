@@ -105,8 +105,9 @@ CREATE TABLE `user` (
     `role_id` binary(16),
 
     `email` varchar(100) NOT NULL,
+    `username` varchar(100),
     `password` varchar(255) NOT NULL,
-    `ivHex` varchar(255) NOT NULL COMMENT 'Initialization vector iv key',
+    `ivHex` varchar(255) COMMENT 'Initialization vector iv key',
     `activated` tinyint(1) NOT NULL DEFAULT 0,
 
     `deleted` tinyint(1) NOT NULL DEFAULT 0,
@@ -131,11 +132,14 @@ CREATE TABLE `account` (
     `first_name` varchar(100),
     `middle_name` varchar(100) COMMENT 'Optional name field',
     `last_name` varchar(100),
-    `avatar` varchar(255) COMMENT 'avatar`s filename',
-    `avatar_url` varchar(255) COMMENT 'avatar`s file url',
+    `gender` varchar(6),
+    `birthdate` date, -- YYYY-MM-DD
 
     `title` varchar(100),
     `position` varchar(100),
+    `location` varchar(255),
+    `avatar` varchar(255) COMMENT 'avatar`s filename',
+    `avatar_url` varchar(255) COMMENT 'avatar`s file url',
 
     `mobile` varchar(20),
     `website` varchar(255),

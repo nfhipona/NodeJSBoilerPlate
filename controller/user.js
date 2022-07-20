@@ -75,11 +75,14 @@ module.exports = (database, auth) => {
         }
 
         function _validate_password(conn, data, record) {
-            cryptor.decrypt(record.password, (err, decrypted) => {
-                helper.log(`pwd: ${data.password} == decrypted: ${decrypted}`);
+            if (!record.ivHex || record.ivHex == null) return helper.send400(conn, res, null, c.USER_SIGNIN_FAILED);
+
+            const encryptedData = { ivHex: record.ivHex, encrypted: record.password };
+            cryptor.decrypt(encryptedData, (err, decrypted) => {
                 if (err || data.password !== decrypted) return helper.send400(conn, res, err, c.USER_SIGNIN_FAILED);
 
                 delete record.password;
+                delete record.ivHex;
                 _get_user_account(conn, record);
             });
         }
@@ -102,10 +105,7 @@ module.exports = (database, auth) => {
 
                 const token = auth.createPayloadToken(record, c.USER_TOKEN);
                 user_data.token_data = token;
-
-                req.user_data = user_data;
-
-                return next(); // proceed to login check
+                helper.send200(conn, res, user_data, c.USER_LOGIN_SUCCESS);
             });
         }
 
@@ -122,9 +122,10 @@ module.exports = (database, auth) => {
                 _role_id: 'uuid',
                 email: '',
                 _username: '',
-                password: ''
+                password: '',
+                _ivHex: ''
             };
-            helper.log(form, 'parameter')
+
             helper.validateBody(form, data, res, () => {
                 database.transaction((err, conn) => {
                     if (err) return helper.sendError(conn, res, err, c.DATABASE_CONN_ERROR);
@@ -139,10 +140,10 @@ module.exports = (database, auth) => {
                 if (err) return helper.sendRollback(database, conn, res, err, c.USER_CREATE_FAILED);
                 data.password = encrypted; // set encrypted password
                 data.ivHex = ivHex;
-    
+
                 const set_query = database.format(form, data);
                 const query = `INSERT INTO user SET ${set_query}`;
-    
+                
                 conn.query(query, (err, rows) => {
                     if (err || rows.affectedRows === 0) return helper.sendRollback(database, conn, res, err, c.USER_CREATE_FAILED);
     
