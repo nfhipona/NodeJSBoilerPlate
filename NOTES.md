@@ -37,6 +37,8 @@ AWS_BUCKET_PRODUCTION=region::AWS_BUCKET_REGION&bucket::BUCKET_NAME_PRODUCTION
 
 AWS_BUCKET_PATH=avatar::avatar_files&sound::sound_files&assets::asset_files
 
+ENCRYPTION=salt::your_salt_here&byteLength::32&algorithm::aes-256-cbc&password::your_encrypt_password
+
 ## License
 
 SAMS API is available under the MIT license. See the [LICENSE](https://bitbucket.org/nferocious76/sams-api/src/master/LICENSE) file for more info.
