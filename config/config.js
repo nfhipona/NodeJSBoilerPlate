@@ -137,12 +137,7 @@ exports.awsBucketConfig = {
 }
 exports.awsBucket           = this.awsBucketConfig.use();
 exports.awsBucketPath       = helper.parseSettingsConfig(env.AWS_BUCKET_PATH);
-
-exports.cryptoConfig = {
-    byteLength: 32,
-    algorithm: 'aes-256-cbc',
-    password: 'boilerplateJs-secret'
-};
+exports.cryptoConfig        = helper.parseSettingsConfig(env.ENCRYPTION);
 
 /**
  * MAIL SETTINGS
